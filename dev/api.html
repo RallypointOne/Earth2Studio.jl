@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>API – Earth2Studio.jl</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./resources/changelog.html" rel="next">
+<link href="./statistics.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-3db6c18bb69885e7f25697a9383847b5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-426f41d558ea4d560124c4548de7cb69.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "/"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search  (/)",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="https://rallypoint1.com" class="navbar-brand navbar-brand-logo">
+    <img src="https://github.com/user-attachments/assets/f7216152-0d6e-4459-8e65-b9ed59421638" alt="" class="navbar-logo light-content">
+    <img src="https://github.com/user-attachments/assets/f7216152-0d6e-4459-8e65-b9ed59421638" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="https://rallypoint1.com">
+    <span class="navbar-title">Earth2Studio.jl</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/RallypointOne/Earth2Studio.jl/stargazers"> <i class="bi bi-star" role="img">
+</i> 
+<span class="menu-text">Star</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/RallypointOne/Earth2Studio.jl"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./api.html">API</a></li><li class="breadcrumb-item"><a href="./api.html"><span class="chapter-title">API</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Docs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Earth2Studio.jl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-sources.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Data Sources</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./workflows.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Workflows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./statistics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Statistics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./api.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">API</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Resources</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./resources/changelog.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Changelog</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./resources/coverage.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#types" id="toc-types" class="nav-link active" data-scroll-target="#types">Types</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./api.html">API</a></li><li class="breadcrumb-item"><a href="./api.html"><span class="chapter-title">API</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">API</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="types" class="level2">
+<h2 class="anchored" data-anchor-id="types">Types</h2>
+<div class="card mb-3">
+<section id="datasource" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="datasource"><code>DataSource</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DataSource</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper around an <code>earth2studio.data.*</code> Python data source object.</p>
+<p>Construct via named constructors like <a href="@ref"><code>ARCO</code></a>, <a href="@ref"><code>GFS</code></a>, etc.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataSource</span>(class_name<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct a <code>DataSource</code> from an arbitrary <code>earth2studio.data</code> class name.</p>
+<section id="examples" class="level3">
+<h3 class="anchored" data-anchor-id="examples">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> <span class="fu">DataSource</span>(<span class="st">"CDS"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="diagnosticmodel" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="diagnosticmodel"><code>DiagnosticModel</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DiagnosticModel</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper around an <code>earth2studio.models.dx.*</code> diagnostic model.</p>
+<p>Construct via named constructors like <a href="@ref"><code>CorrDiff</code></a>, <a href="@ref"><code>ClimateNet</code></a>, etc.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DiagnosticModel</span>(class_name<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct a <code>DiagnosticModel</code> from an arbitrary <code>earth2studio.models.dx</code> class name.</p>
+<section id="examples-1" class="level3">
+<h3 class="anchored" data-anchor-id="examples-1">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> <span class="fu">DiagnosticModel</span>(<span class="st">"CorrDiff"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="iobackend" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="iobackend"><code>IOBackend</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>IOBackend</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper around an <code>earth2studio.io.*</code> IO backend for storing forecast results.</p>
+<p>Construct via named constructors like <a href="@ref"><code>ZarrBackend</code></a>, <a href="@ref"><code>NetCDF4Backend</code></a>, etc.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">IOBackend</span>(class_name<span class="op">::</span><span class="dt">AbstractString</span>, args<span class="op">...</span>; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct an <code>IOBackend</code> from an arbitrary <code>earth2studio.io</code> class name.</p>
+<section id="examples-2" class="level3">
+<h3 class="anchored" data-anchor-id="examples-2">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>io <span class="op">=</span> <span class="fu">IOBackend</span>(<span class="st">"ZarrBackend"</span>, <span class="st">"/tmp/output.zarr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="perturbation" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="perturbation"><code>Perturbation</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Perturbation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper around an <code>earth2studio.perturbation.*</code> perturbation method.</p>
+<p>Construct via named constructors like <a href="@ref"><code>Gaussian</code></a>, <a href="@ref"><code>Zero</code></a>, etc.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Perturbation</span>(class_name<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct a <code>Perturbation</code> from an arbitrary <code>earth2studio.perturbation</code> class name.</p>
+<section id="examples-3" class="level3">
+<h3 class="anchored" data-anchor-id="examples-3">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">Perturbation</span>(<span class="st">"Gaussian"</span>; noise_amplitude<span class="op">=</span><span class="fl">0.05</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="prognosticmodel" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="prognosticmodel"><code>PrognosticModel</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>PrognosticModel</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper around an <code>earth2studio.models.px.*</code> prognostic (forecast) model.</p>
+<p>Construct via named constructors like <a href="@ref"><code>FourCastNet</code></a>, <a href="@ref"><code>Pangu24</code></a>, etc.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PrognosticModel</span>(class_name<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct a <code>PrognosticModel</code> from an arbitrary <code>earth2studio.models.px</code> class name.</p>
+<section id="examples-4" class="level3">
+<h3 class="anchored" data-anchor-id="examples-4">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> <span class="fu">PrognosticModel</span>(<span class="st">"FCN"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="statistic" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="statistic"><code>Statistic</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Statistic</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper around an <code>earth2studio.statistics.*</code> verification metric.</p>
+<p>Construct via named constructors like <a href="@ref"><code>RMSE</code></a>, <a href="@ref"><code>ACC</code></a>, etc.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Statistic</span>(name<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct a <code>Statistic</code> from an arbitrary <code>earth2studio.statistics</code> function name.</p>
+<section id="examples-5" class="level3">
+<h3 class="anchored" data-anchor-id="examples-5">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="fu">Statistic</span>(<span class="st">"rmse"</span>; reduction_dimensions<span class="op">=</span><span class="dt">String</span>[])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<div class="card mb-3">
+<section id="acc" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="acc"><code>ACC</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ACC</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Anomaly Correlation Coefficient metric.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="aifs" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="aifs"><code>AIFS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIFS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>ECMWF AIFS (Artificial Intelligence Forecasting System) model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="aifsens" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="aifsens"><code>AIFSENS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIFSENS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>ECMWF AIFS ensemble model variant.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="arco" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="arco"><code>ARCO</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ARCO</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Google’s Analysis-Ready, Cloud-Optimized ERA5 dataset.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="asynczarrbackend" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="asynczarrbackend"><code>AsyncZarrBackend</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AsyncZarrBackend</span>(path<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AsyncZarrBackend</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Asynchronous Zarr storage backend.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="aurora" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="aurora"><code>Aurora</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Aurora</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Microsoft Aurora foundation model for weather.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="bredvector" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="bredvector"><code>BredVector</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BredVector</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Bred vector ensemble perturbation method.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="brierscore" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="brierscore"><code>BrierScore</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BrierScore</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Brier Score for probabilistic binary forecasts.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="brown" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="brown"><code>Brown</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Brown</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Brownian noise perturbation.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="cds" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="cds"><code>CDS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CDS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Copernicus Climate Data Store data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="crps" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="crps"><code>CRPS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CRPS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Continuous Ranked Probability Score metric.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="climatenet" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="climatenet"><code>ClimateNet</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ClimateNet</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>ClimateNet extreme weather event detection model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="corrdiff" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="corrdiff"><code>CorrDiff</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrDiff</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NVIDIA CorrDiff generative downscaling model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="corrdiffcmip6" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="corrdiffcmip6"><code>CorrDiffCMIP6</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrDiffCMIP6</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>CorrDiff model trained on CMIP6 data.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="corrdifftaiwan" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="corrdifftaiwan"><code>CorrDiffTaiwan</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrDiffTaiwan</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>CorrDiff model trained on Taiwan domain.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="correlatedsphericalgaussian" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="correlatedsphericalgaussian"><code>CorrelatedSphericalGaussian</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrelatedSphericalGaussian</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Correlated spherical Gaussian perturbation.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="dlwp" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="dlwp"><code>DLWP</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DLWP</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Deep Learning Weather Prediction model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="derivedrh" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="derivedrh"><code>DerivedRH</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DerivedRH</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Derived relative humidity diagnostic (analytic, no model weights).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="derivedvpd" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="derivedvpd"><code>DerivedVPD</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DerivedVPD</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Derived vapor pressure deficit diagnostic (analytic, no model weights).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="derivedws" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="derivedws"><code>DerivedWS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DerivedWS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Derived wind speed diagnostic (analytic, no model weights).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="fcn3" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="fcn3"><code>FCN3</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">FCN3</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>FourCastNet v3 global weather model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="fss" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="fss"><code>FSS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">FSS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Fractions Skill Score metric.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="fengwu" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="fengwu"><code>FengWu</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">FengWu</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Shanghai AI Lab FengWu weather model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="fourcastnet" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="fourcastnet"><code>FourCastNet</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">FourCastNet</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NVIDIA FourCastNet v1/v2 global weather model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="gfs" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="gfs"><code>GFS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GFS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NOAA Global Forecast System data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="gfs_fs" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="gfs_fs"><code>GFS_FS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GFS_FS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>GFS forecast data source (as opposed to analysis).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="goes" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="goes"><code>GOES</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GOES</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>GOES satellite imagery data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="gaussian" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="gaussian"><code>Gaussian</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Gaussian</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Gaussian noise perturbation.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="graphcast" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="graphcast"><code>GraphCast</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GraphCast</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>DeepMind GraphCast (small variant) weather model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="graphcastoper" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="graphcastoper"><code>GraphCastOper</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GraphCastOper</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>DeepMind GraphCast operational variant.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="hrrr" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="hrrr"><code>HRRR</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HRRR</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NOAA High-Resolution Rapid Refresh analysis data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="hrrr_fx" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="hrrr_fx"><code>HRRR_FX</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HRRR_FX</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NOAA High-Resolution Rapid Refresh forecast data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="hemisphericcentredbredvector" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="hemisphericcentredbredvector"><code>HemisphericCentredBredVector</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HemisphericCentredBredVector</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Hemispheric-centred bred vector perturbation method.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="ifs" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="ifs"><code>IFS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">IFS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>ECMWF Integrated Forecasting System data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="interpmodafno" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="interpmodafno"><code>InterpModAFNO</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">InterpModAFNO</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Interpolation model using AFNO backbone.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="kvbackend" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="kvbackend"><code>KVBackend</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">KVBackend</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Key-value store backend.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="laggedensemble" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="laggedensemble"><code>LaggedEnsemble</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">LaggedEnsemble</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Lagged average ensemble perturbation.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="logscore" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="logscore"><code>LogScore</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">LogScore</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Logarithmic scoring rule for probabilistic forecasts.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="mae" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="mae"><code>MAE</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MAE</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Mean Absolute Error metric.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="mrms" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="mrms"><code>MRMS</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MRMS</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Multi-Radar Multi-Sensor precipitation data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="mse" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="mse"><code>MSE</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MSE</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Mean Squared Error metric.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="mean" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="mean"><code>Mean</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Mean</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Mean statistic.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="ncar_era5" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="ncar_era5"><code>NCAR_ERA5</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb61"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">NCAR_ERA5</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NCAR Research Data Archive ERA5 data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="netcdf4backend" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="netcdf4backend"><code>NetCDF4Backend</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">NetCDF4Backend</span>(path<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">NetCDF4Backend</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NetCDF4 file storage backend.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="pangu24" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="pangu24"><code>Pangu24</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Pangu24</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pangu-Weather 24-hour step model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="pangu3" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="pangu3"><code>Pangu3</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb64"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Pangu3</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pangu-Weather 3-hour step model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="pangu6" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="pangu6"><code>Pangu6</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Pangu6</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pangu-Weather 6-hour step model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="persistence" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="persistence"><code>Persistence</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb66"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Persistence</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Persistence (no-skill baseline) forecast model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="precipitationafno" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="precipitationafno"><code>PrecipitationAFNO</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb67"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PrecipitationAFNO</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>AFNO-based precipitation diagnostic model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="precipitationafnov2" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="precipitationafnov2"><code>PrecipitationAFNOv2</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb68"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PrecipitationAFNOv2</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>AFNO-based precipitation diagnostic model (v2).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="rmse" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="rmse"><code>RMSE</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb69"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">RMSE</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Root Mean Square Error metric.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="rankhistogram" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="rankhistogram"><code>RankHistogram</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb70"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">RankHistogram</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Rank histogram for ensemble reliability.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="reliabilitydiagram" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="reliabilitydiagram"><code>ReliabilityDiagram</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb71"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ReliabilityDiagram</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Reliability diagram data for probabilistic forecast calibration.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="solarradiationafno1h" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="solarradiationafno1h"><code>SolarRadiationAFNO1H</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb72"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SolarRadiationAFNO1H</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>AFNO-based solar radiation model (1-hour resolution).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="solarradiationafno6h" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="solarradiationafno6h"><code>SolarRadiationAFNO6H</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb73"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SolarRadiationAFNO6H</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>AFNO-based solar radiation model (6-hour resolution).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="sphericalgaussian" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="sphericalgaussian"><code>SphericalGaussian</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb74"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SphericalGaussian</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Spherical Gaussian noise perturbation (latitude-weighted).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="spreadskillratio" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="spreadskillratio"><code>SpreadSkillRatio</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb75"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SpreadSkillRatio</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Spread-skill ratio metric for ensemble calibration.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="stormcast" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="stormcast"><code>StormCast</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb76"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">StormCast</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>NVIDIA StormCast high-resolution convective model.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="tctrackervitart" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="tctrackervitart"><code>TCTrackerVitart</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb77"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">TCTrackerVitart</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tropical cyclone tracker using Vitart algorithm.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="tctrackerwuduan" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="tctrackerwuduan"><code>TCTrackerWuDuan</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb78"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">TCTrackerWuDuan</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tropical cyclone tracker using Wu-Duan algorithm.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="variance" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="variance"><code>Variance</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb79"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Variance</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Variance statistic.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="wb2climatology" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="wb2climatology"><code>WB2Climatology</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb80"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">WB2Climatology</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>WeatherBench2 climatology data source.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="wb2era5" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="wb2era5"><code>WB2ERA5</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb81"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">WB2ERA5</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>WeatherBench2 ERA5 data source (cloud-hosted on GCS).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="xarraybackend" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="xarraybackend"><code>XarrayBackend</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb82"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">XarrayBackend</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In-memory xarray Dataset backend (results stay in Python memory).</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="zarrbackend" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="zarrbackend"><code>ZarrBackend</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb83"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ZarrBackend</span>(path<span class="op">::</span><span class="dt">AbstractString</span>; kwargs<span class="op">...</span>)</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ZarrBackend</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zarr storage backend for writing forecast results to disk.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="zero" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="zero"><code>Zero</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb84"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Zero</span>(; kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zero (no-op) perturbation. Useful for deterministic runs or testing.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="datetime_to_np64" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="datetime_to_np64"><code>datetime_to_np64</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb85"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">datetime_to_np64</span>(dt<span class="op">::</span><span class="dt">DateTime</span>)</span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="fu">datetime_to_np64</span>(d<span class="op">::</span><span class="dt">Date</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convert a Julia <code>DateTime</code> or <code>Date</code> to a <code>numpy.datetime64</code> object.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="fetch_data" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="fetch_data"><code>fetch_data</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb86"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fetch_data</span>(ds<span class="op">::</span><span class="dt">DataSource</span>, time, variable)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Fetch data and return a Julia <code>NamedTuple</code> with fields <code>data</code>, <code>dims</code>, and <code>coords</code>.</p>
+<section id="examples-6" class="level3">
+<h3 class="anchored" data-anchor-id="examples-6">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb87"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> <span class="fu">WB2ERA5</span>()</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="fu">fetch_data</span>(ds, <span class="fu">DateTime</span>(<span class="fl">2024</span>, <span class="fl">1</span>, <span class="fl">1</span>), [<span class="st">"t2m"</span>, <span class="st">"u10m"</span>])</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>result.data   <span class="co"># Array{Float32}</span></span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>result.dims   <span class="co"># (:time, :variable, :lat, :lon)</span></span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>result.coords <span class="co"># NamedTuple of coordinate vectors</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="is_pymodule_available" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="is_pymodule_available"><code>is_pymodule_available</code></h4>
+</section>
+<div class="card-body">
+<p>No documentation found for public binding <code>Earth2Studio.is_pymodule_available</code>.</p>
+<p><code>Earth2Studio.is_pymodule_available</code> is a <code>Function</code>.</p>
+<pre><code># 1 method for generic function "is_pymodule_available" from Earth2Studio:
+ [1] is_pymodule_available(key::Symbol)
+     @ ~/work/Earth2Studio.jl/Earth2Studio.jl/src/Earth2Studio.jl:91</code></pre>
+</div>
+</div>
+<div class="card mb-3">
+<section id="np64_to_datetime" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="np64_to_datetime"><code>np64_to_datetime</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb89"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">np64_to_datetime</span>(x<span class="op">::</span><span class="dt">Py</span>) <span class="op">-&gt;</span> <span class="dt">DateTime</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convert a <code>numpy.datetime64</code> Python object back to a Julia <code>DateTime</code>. Nanosecond precision is truncated to seconds.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="py_object" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="py_object"><code>py_object</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb90"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">py_object</span>(x<span class="op">::</span><span class="dt">Earth2StudioObject</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Return the underlying Python object wrapped by <code>x</code>.</p>
+</div>
+</div>
+<div class="card mb-3">
+<section id="pymodule" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="pymodule"><code>pymodule</code></h4>
+</section>
+<div class="card-body">
+<p>No documentation found for public binding <code>Earth2Studio.pymodule</code>.</p>
+<p><code>Earth2Studio.pymodule</code> is a <code>Function</code>.</p>
+<pre><code># 1 method for generic function "pymodule" from Earth2Studio:
+ [1] pymodule(key::Symbol)
+     @ ~/work/Earth2Studio.jl/Earth2Studio.jl/src/Earth2Studio.jl:83</code></pre>
+</div>
+</div>
+<div class="card mb-3">
+<section id="pymodule_error" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="pymodule_error"><code>pymodule_error</code></h4>
+</section>
+<div class="card-body">
+<p>No documentation found for public binding <code>Earth2Studio.pymodule_error</code>.</p>
+<p><code>Earth2Studio.pymodule_error</code> is a <code>Function</code>.</p>
+<pre><code># 1 method for generic function "pymodule_error" from Earth2Studio:
+ [1] pymodule_error(key::Symbol)
+     @ ~/work/Earth2Studio.jl/Earth2Studio.jl/src/Earth2Studio.jl:92</code></pre>
+</div>
+</div>
+<div class="card mb-3">
+<section id="run_deterministic" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="run_deterministic"><code>run_deterministic</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb93"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_deterministic</span>(time, nsteps, prognostic, data, io; device<span class="op">=</span><span class="cn">nothing</span>, kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run a deterministic forecast for <code>nsteps</code> time steps. Returns the <code>IOBackend</code> containing results.</p>
+<section id="examples-7" class="level3">
+<h3 class="anchored" data-anchor-id="examples-7">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb94"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>io <span class="op">=</span> <span class="fu">run_deterministic</span>(<span class="fu">DateTime</span>(<span class="fl">2024</span>, <span class="fl">1</span>, <span class="fl">1</span>), <span class="fl">10</span>, model, data, <span class="fu">ZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>))</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> <span class="fu">to_xarray</span>(io)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="run_diagnostic" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="run_diagnostic"><code>run_diagnostic</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb95"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_diagnostic</span>(time, nsteps, prognostic, diagnostic, data, io; device<span class="op">=</span><span class="cn">nothing</span>, kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run a forecast with a diagnostic model applied at each step. Returns the <code>IOBackend</code> containing results.</p>
+<section id="examples-8" class="level3">
+<h3 class="anchored" data-anchor-id="examples-8">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb96"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>io <span class="op">=</span> <span class="fu">run_diagnostic</span>(<span class="fu">DateTime</span>(<span class="fl">2024</span>,<span class="fl">1</span>,<span class="fl">1</span>), <span class="fl">10</span>, px_model, dx_model, data, <span class="fu">ZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>))</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> <span class="fu">to_xarray</span>(io)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="run_ensemble" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="run_ensemble"><code>run_ensemble</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb97"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_ensemble</span>(time, nsteps, nensemble, prognostic, data, io, perturbation; batch_size<span class="op">=</span><span class="cn">nothing</span>, device<span class="op">=</span><span class="cn">nothing</span>, kwargs<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run an ensemble forecast with <code>nensemble</code> members. Returns the <code>IOBackend</code> containing results.</p>
+<section id="examples-9" class="level3">
+<h3 class="anchored" data-anchor-id="examples-9">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb98"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>io <span class="op">=</span> <span class="fu">run_ensemble</span>(<span class="fu">DateTime</span>(<span class="fl">2024</span>,<span class="fl">1</span>,<span class="fl">1</span>), <span class="fl">10</span>, <span class="fl">4</span>, model, data, <span class="fu">ZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>), <span class="fu">Zero</span>())</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> <span class="fu">to_xarray</span>(io)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="to_device-to_device" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="to_device-to_device"><code>to_device!</code> {#to_device!}</h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb99"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_device!</span>(model, device<span class="op">::</span><span class="dt">AbstractString</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Move a prognostic or diagnostic model to the specified device (e.g.&nbsp;<code>"cuda"</code>, <code>"cpu"</code>).</p>
+<section id="examples-10" class="level3">
+<h3 class="anchored" data-anchor-id="examples-10">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb100"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> <span class="fu">Pangu24</span>()</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">to_device!</span>(model, <span class="st">"cuda"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="to_xarray" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="to_xarray"><code>to_xarray</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb101"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_xarray</span>(io<span class="op">::</span><span class="dt">IOBackend</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Return the xarray Dataset stored in an <code>IOBackend</code> after a workflow run completes.</p>
+<section id="examples-11" class="level3">
+<h3 class="anchored" data-anchor-id="examples-11">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb102"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>io <span class="op">=</span> <span class="fu">ZarrBackend</span>(<span class="st">"/tmp/forecast.zarr"</span>)</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>io <span class="op">=</span> <span class="fu">run_deterministic</span>(time, <span class="fl">10</span>, model, data, io)</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> <span class="fu">to_xarray</span>(io)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+<div class="card mb-3">
+<section id="xarray_to_dict" class="level4 card-header api-item-header">
+<h4 class="anchored" data-anchor-id="xarray_to_dict"><code>xarray_to_dict</code></h4>
+</section>
+<div class="card-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb103"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xarray_to_dict</span>(da<span class="op">::</span><span class="dt">Py</span>) <span class="op">-&gt;</span> <span class="dt">NamedTuple</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convert an xarray <code>DataArray</code> to a Julia <code>NamedTuple</code> with fields <code>data</code>, <code>dims</code>, and <code>coords</code>.</p>
+<section id="examples-12" class="level3">
+<h3 class="anchored" data-anchor-id="examples-12">Examples</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb104"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="fu">fetch_data</span>(ds, <span class="fu">DateTime</span>(<span class="fl">2024</span>,<span class="fl">1</span>,<span class="fl">1</span>), <span class="st">"t2m"</span>)</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>result.data   <span class="co"># Array of values</span></span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>result.dims   <span class="co"># (:time, :variable, :lat, :lon)</span></span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>result.coords <span class="co"># NamedTuple of coordinate vectors</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./statistics.html" class="pagination-link" aria-label="Statistics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Statistics</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./resources/changelog.html" class="pagination-link" aria-label="Changelog">
+        <span class="nav-page-text"><span class="chapter-title">Changelog</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Built on 2026-04-14</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>
+(function() {
+    // Detect repo name and current version from URL path
+    // Deployed: /{repoName}/{version}/...
+    // Local preview: /page.html (no repo/version segments)
+    var pathParts = window.location.pathname.split('/').filter(Boolean);
+    var isLocal = pathParts.length < 2 || !pathParts[0].includes('.');
+    var currentVersion, basePath;
+
+    if (pathParts.length >= 2 && pathParts[1].match(/^(dev|stable|v\d)/)) {
+        currentVersion = pathParts[1];
+        basePath = '/' + pathParts[0] + '/';
+    } else {
+        currentVersion = 'dev';
+        basePath = '/';
+    }
+
+    // Build dropdown HTML
+    function buildDropdown(versions) {
+        var navbar = document.querySelector('.navbar-nav.navbar-nav-scroll.ms-auto');
+        if (!navbar) return;
+
+        var li = document.createElement('li');
+        li.className = 'nav-item dropdown';
+        li.innerHTML =
+            '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                currentVersion +
+            '</a>' +
+            '<ul class="dropdown-menu dropdown-menu-end"></ul>';
+
+        var menu = li.querySelector('.dropdown-menu');
+
+        // Always add dev and stable
+        var fixed = ['stable', 'dev'];
+        fixed.forEach(function(v) {
+            var a = document.createElement('a');
+            a.className = 'dropdown-item' + (v === currentVersion ? ' active' : '');
+            a.href = basePath + v + '/';
+            a.textContent = v;
+            var item = document.createElement('li');
+            item.appendChild(a);
+            menu.appendChild(item);
+        });
+
+        // Add release versions from versions.json
+        if (versions && versions.length > 0) {
+            var divider = document.createElement('li');
+            divider.innerHTML = '<hr class="dropdown-divider">';
+            menu.appendChild(divider);
+
+            versions.forEach(function(v) {
+                var a = document.createElement('a');
+                a.className = 'dropdown-item' + (v === currentVersion ? ' active' : '');
+                a.href = basePath + v + '/';
+                a.textContent = v;
+                var item = document.createElement('li');
+                item.appendChild(a);
+                menu.appendChild(item);
+            });
+        }
+
+        navbar.prepend(li);
+
+        // Show outdated version banner
+        if (versions && versions.length > 0 && currentVersion !== 'stable' && currentVersion !== 'dev') {
+            var latest = versions[0]; // versions.json is sorted descending
+            if (currentVersion !== latest) {
+                var banner = document.createElement('div');
+                banner.className = 'alert alert-warning text-center mb-0 rounded-0';
+                banner.setAttribute('role', 'alert');
+                banner.innerHTML = 'You are viewing docs for <strong>' + currentVersion + '</strong>. ' +
+                    'The latest stable release is <a href="' + basePath + 'stable/" class="alert-link">' + latest + '</a>.';
+                document.body.prepend(banner);
+            }
+        }
+    }
+
+    // Fetch versions.json, then build dropdown
+    fetch(basePath + 'versions.json')
+        .then(function(res) { return res.ok ? res.json() : []; })
+        .catch(function() { return []; })
+        .then(buildDropdown);
+
+    // Fix navbar-brand title link to point to docs home (logo stays external)
+    var titleLink = document.querySelector('a.navbar-brand:not(.navbar-brand-logo)');
+    if (titleLink) {
+        titleLink.href = basePath + currentVersion + '/';
+    }
+
+    // Fetch star count from GitHub API
+    var starLink = document.querySelector('a.nav-link[href*="/stargazers"]');
+    if (starLink) {
+        var match = starLink.href.match(/github\.com\/([^/]+\/[^/]+)\/stargazers/);
+        if (match) {
+            fetch('https://api.github.com/repos/' + match[1])
+                .then(function(res) { return res.ok ? res.json() : null; })
+                .then(function(data) {
+                    if (!data) return;
+                    var text = starLink.querySelector('.menu-text');
+                    if (text) text.textContent = data.stargazers_count;
+                })
+                .catch(function() {});
+        }
+    }
+})();
+</script>
+
+
+
+
+</body></html>
