@@ -1,0 +1,107 @@
+---
+title: "Workflows"
+---
+
+Earth2Studio.jl provides three standard forecast workflows. Each writes results into an IO backend and returns it for further analysis.
+
+## Deterministic Forecast
+
+Run a single-member forecast:
+
+```julia
+using Earth2Studio, Dates
+
+data = GFS()
+model = Pangu24()
+io = ZarrBackend("/tmp/deterministic.zarr")
+
+result = run_deterministic(DateTime(2024, 1, 1), 10, model, data, io)
+ds = to_xarray(result)
+```
+
+**Arguments:**
+
+- `time`: Initial time (`DateTime`, `Date`, or vector)
+- `nsteps`: Number of forecast steps
+- `prognostic`: A `PrognosticModel`
+- `data`: A `DataSource`
+- `io`: An `IOBackend`
+- `device` (keyword): `"cuda"` or `"cpu"` (default: model's current device)
+
+## Ensemble Forecast
+
+Run a multi-member ensemble with perturbations:
+
+```julia
+data = GFS()
+model = Pangu24()
+io = ZarrBackend("/tmp/ensemble.zarr")
+perturb = Gaussian()
+
+result = run_ensemble(DateTime(2024, 1, 1), 10, 4, model, data, io, perturb)
+ds = to_xarray(result)
+```
+
+**Additional arguments:**
+
+- `nensemble`: Number of ensemble members
+- `perturbation`: A `Perturbation` method
+- `batch_size` (keyword): GPU batch size (default: `nensemble`)
+
+## Diagnostic Forecast
+
+Apply a diagnostic model at each forecast step:
+
+```julia
+data = GFS()
+px_model = Pangu24()
+dx_model = PrecipitationAFNO()
+io = ZarrBackend("/tmp/diagnostic.zarr")
+
+result = run_diagnostic(DateTime(2024, 1, 1), 10, px_model, dx_model, data, io)
+ds = to_xarray(result)
+```
+
+## IO Backends
+
+Choose where to store forecast results:
+
+| Constructor | Description |
+|:---|:---|
+| `ZarrBackend(path)` | Zarr store on disk |
+| `AsyncZarrBackend(path)` | Asynchronous Zarr store |
+| `NetCDF4Backend(path)` | NetCDF4 file |
+| `XarrayBackend()` | In-memory xarray Dataset |
+| `KVBackend()` | Key-value store |
+
+## Perturbation Methods
+
+Methods for generating ensemble spread:
+
+| Constructor | Description |
+|:---|:---|
+| `Gaussian()` | Gaussian noise |
+| `SphericalGaussian()` | Latitude-weighted Gaussian |
+| `CorrelatedSphericalGaussian()` | Correlated spherical Gaussian |
+| `Brown()` | Brownian noise |
+| `BredVector()` | Bred vector method |
+| `LaggedEnsemble()` | Lagged average ensemble |
+| `HemisphericCentredBredVector()` | Hemispheric-centred bred vectors |
+| `Zero()` | No perturbation (deterministic ensemble) |
+
+## Reading Results
+
+After a workflow completes, extract the xarray Dataset:
+
+```julia
+ds = to_xarray(result)
+```
+
+Convert to Julia arrays:
+
+```julia
+julia_data = xarray_to_dict(ds["t2m"])
+julia_data.data    # Array
+julia_data.dims    # Tuple of dimension names
+julia_data.coords  # NamedTuple of coordinate vectors
+```

@@ -1,0 +1,65 @@
+---
+title: "Data Sources"
+---
+
+Data sources provide initial conditions and verification data for weather forecasts. Each source wraps an `earth2studio.data` Python class and returns data as xarray DataArrays.
+
+## Available Sources
+
+| Constructor | Description |
+|:---|:---|
+| `ARCO()` | Google Analysis-Ready, Cloud-Optimized ERA5 |
+| `GFS()` | NOAA Global Forecast System analysis |
+| `GFS_FS()` | NOAA GFS forecast data |
+| `IFS()` | ECMWF Integrated Forecasting System |
+| `CDS()` | Copernicus Climate Data Store |
+| `NCAR_ERA5()` | NCAR Research Data Archive ERA5 |
+| `WB2ERA5()` | WeatherBench2 ERA5 (cloud-hosted on GCS) |
+| `WB2Climatology()` | WeatherBench2 climatology |
+| `GOES()` | GOES satellite imagery |
+| `MRMS()` | Multi-Radar Multi-Sensor precipitation |
+| `HRRR()` | NOAA High-Resolution Rapid Refresh analysis |
+| `HRRR_FX()` | NOAA HRRR forecast data |
+
+## Fetching Data
+
+All data sources are callable. Pass a time (or vector of times) and variable name(s):
+
+```julia
+using Earth2Studio, Dates
+
+ds = WB2ERA5()
+
+# Fetch a single variable at one time
+da = ds(DateTime(2024, 1, 1), "t2m")
+
+# Fetch multiple variables at multiple times
+da = ds([DateTime(2024, 1, 1), DateTime(2024, 1, 2)], ["t2m", "u10m", "v10m"])
+```
+
+## Converting to Julia Arrays
+
+Use `fetch_data` for a one-call Julia-native result:
+
+```julia
+result = fetch_data(ds, DateTime(2024, 1, 1), ["t2m", "msl"])
+
+result.data    # Array of values
+result.dims    # e.g. (:time, :variable, :lat, :lon)
+result.coords  # NamedTuple of coordinate vectors
+```
+
+Or use `xarray_to_dict` on any xarray DataArray:
+
+```julia
+da = ds(DateTime(2024, 1, 1), "t2m")
+result = xarray_to_dict(da)
+```
+
+## Custom Data Sources
+
+Construct from any `earth2studio.data` class name:
+
+```julia
+ds = DataSource("CDS"; kwargs...)
+```

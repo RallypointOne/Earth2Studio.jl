@@ -25,6 +25,11 @@ book:
     - part: "Docs"
       chapters:
         - index.qmd
+        - tutorial.qmd
+        - data-sources.qmd
+        - models.qmd
+        - workflows.qmd
+        - statistics.qmd
     - part: "API"
       chapters:
         - api.qmd

@@ -1,0 +1,6 @@
+# The pixi backend (CondaPkg default since 0.2.30) crashes PythonCall's
+# `JlWrap.__init__` inside `Pkg.test()` sandboxes on macOS / Julia 1.12 with an
+# UndefRefError during precompile. Direct invocation (`julia --project=. test/runtests.jl`)
+# works either way. MicroMamba avoids the issue, so pin it here.
+[CondaPkg]
+backend = "MicroMamba"

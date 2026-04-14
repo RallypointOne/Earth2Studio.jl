@@ -6,10 +6,44 @@ Welcome to the documentation for **Earth2Studio.jl**.
 
 ## Overview
 
-Earth2Studio.jl is a Julia package that ...
+Earth2Studio.jl is a Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI-powered weather and climate forecasting. It provides:
+
+- **Data Sources**: Access ERA5 reanalysis, GFS forecasts, HRRR, and more via a unified interface.
+- **Prognostic Models**: Run state-of-the-art AI weather models including FourCastNet, Pangu-Weather, GraphCast, Aurora, and AIFS.
+- **Diagnostic Models**: Apply downscaling (CorrDiff), precipitation estimation, tropical cyclone tracking, and derived quantities.
+- **Ensemble Forecasting**: Generate perturbed ensemble members with Gaussian, bred vector, and lagged ensemble methods.
+- **Verification Metrics**: Compute RMSE, ACC, CRPS, Brier scores, and more.
+
+The package uses [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) and [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) to manage the Python environment automatically.
 
 ## Quickstart
 
-```{julia}
-println("Hello, World!")
+```julia
+using Pkg
+Pkg.add(url="https://github.com/RallypointOne/Earth2Studio.jl")
+```
+
+The base package installs lightweight Python dependencies (numpy, xarray). To use AI models, add `earth2studio` with the desired extras to your project's `CondaPkg.toml`:
+
+```toml
+[pip.deps]
+"earth2studio[pangu]" = ""
+```
+
+Then run a deterministic forecast:
+
+```julia
+using Earth2Studio
+using Dates
+
+# Load data and model
+data = GFS()
+model = Pangu24()
+io = ZarrBackend("/tmp/forecast.zarr")
+
+# Run a 10-step forecast from a specific date
+result = run_deterministic(DateTime(2024, 1, 15), 10, model, data, io)
+
+# Convert results to Julia arrays
+ds = to_xarray(result)
 ```
