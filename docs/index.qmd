@@ -1,0 +1,15 @@
+---
+title: "Earth2Studio.jl"
+---
+
+Welcome to the documentation for **Earth2Studio.jl**.
+
+## Overview
+
+Earth2Studio.jl is a Julia package that ...
+
+## Quickstart
+
+```{julia}
+println("Hello, World!")
+```

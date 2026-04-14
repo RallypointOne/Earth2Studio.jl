@@ -1,0 +1,7 @@
+name = "Earth2Studio"
+uuid = "34b41d48-2513-4399-99f0-ab77257266af"
+version = "0.1.0"
+authors = ["joshday"]
+
+[compat]
+julia = "1"
