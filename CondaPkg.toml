@@ -1,24 +1,9 @@
-# Python environment for Earth2Studio.jl.
-#
-# We declare only the lightweight prerequisites here (python, numpy, xarray) so
-# `Pkg.instantiate()` does not pull a multi-GB PyTorch install on every machine.
-# The earth2studio package and the heavy model-specific extras must be added to
-# the consuming project's own CondaPkg.toml, for example:
-#
-#   [pip.deps]
-#   "earth2studio[fcn,pangu]" = ""
-#
-# Or from source:
-#
-#   [pip.deps]
-#   earth2studio = { git = "https://github.com/NVIDIA/earth2studio.git" }
-#
-# The package's __init__ uses defensive pyimports — unavailable submodules are
-# recorded and surfaced at first use, not at package load.
-
 channels = ["conda-forge"]
 
 [deps]
-python = ">=3.10"
-numpy = ""
 xarray = ""
+numpy = ""
+python = ">=3.10"
+
+[pip.deps]
+earth2studio = ""
