@@ -90,24 +90,15 @@ end
 # the data-source stack may cache SSL defaults at import time. Honors any
 # pre-set SSL_CERT_FILE / REQUESTS_CA_BUNDLE.
 function _ensure_ssl_cert_file()
-    pyos = try
-        pyimport("os")
-    catch
-        return
-    end
-    pyenv_has(k) = pyconvert(Bool, pyos.environ.__contains__(k))
-    (haskey(ENV, "SSL_CERT_FILE") || haskey(ENV, "REQUESTS_CA_BUNDLE") ||
-     pyenv_has("SSL_CERT_FILE") || pyenv_has("REQUESTS_CA_BUNDLE")) && return
+    haskey(ENV, "SSL_CERT_FILE") && return
     cert = try
-        joinpath(pyconvert(String, pyimport("sys").prefix), "ssl", "cert.pem")
+        pyconvert(String, pyimport("certifi").where())
     catch
         return
     end
-    if isfile(cert)
-        ENV["SSL_CERT_FILE"] = cert
-        pyos.environ["SSL_CERT_FILE"] = cert
-    end
-    return nothing
+    ENV["SSL_CERT_FILE"] = cert
+    pyimport("os").environ["SSL_CERT_FILE"] = cert
+    return
 end
 
 end # module
