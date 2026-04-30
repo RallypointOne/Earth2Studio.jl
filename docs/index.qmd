@@ -2,48 +2,38 @@
 title: "Earth2Studio.jl"
 ---
 
-Welcome to the documentation for **Earth2Studio.jl**.
-
 ## Overview
 
-Earth2Studio.jl is a Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI-powered weather and climate forecasting. It provides:
+**Earth2Studio.jl** is a thin Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI-powered weather and climate forecasting. It uses [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) to expose the full `earth2studio` Python API — data sources, prognostic and diagnostic models, perturbations, IO backends, run workflows, and verification statistics — as native Python objects you can call from Julia.
 
-- **Data Sources**: Access ERA5 reanalysis, GFS forecasts, HRRR, and more via a unified interface.
-- **Prognostic Models**: Run state-of-the-art AI weather models including FourCastNet, Pangu-Weather, GraphCast, Aurora, and AIFS.
-- **Diagnostic Models**: Apply downscaling (CorrDiff), precipitation estimation, tropical cyclone tracking, and derived quantities.
-- **Ensemble Forecasting**: Generate perturbed ensemble members with Gaussian, bred vector, and lagged ensemble methods.
-- **Verification Metrics**: Compute RMSE, ACC, CRPS, Brier scores, and more.
-
-The package uses [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) and [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) to manage the Python environment automatically.
+The package itself is intentionally minimal: it imports `earth2studio` and its top-level submodules, and re-exports them as `Py` references. All functionality lives in the upstream Python package.
 
 ## Quickstart
 
+Install Earth2Studio.jl:
+
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/RallypointOne/Earth2Studio.jl")
+Pkg.add("Earth2Studio")
 ```
 
-The base package installs lightweight Python dependencies (numpy, xarray). To use AI models, add `earth2studio` with the desired extras to your project's `CondaPkg.toml`:
+The Conda environment managed by [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) installs Python, NumPy, and xarray. The `earth2studio` Python package itself must be added to your project (extras pick which models you want):
 
-```toml
-[pip.deps]
-"earth2studio[pangu]" = ""
+```julia
+using CondaPkg
+CondaPkg.add_pip("earth2studio")            # base
+CondaPkg.add_pip("earth2studio[fcn,pangu]") # with model extras
 ```
 
-Then run a deterministic forecast:
+Then call into the Python API:
 
 ```julia
 using Earth2Studio
-using Dates
 
-# Load data and model
-data = GFS()
-model = Pangu24()
-io = ZarrBackend("/tmp/forecast.zarr")
-
-# Run a 10-step forecast from a specific date
-result = run_deterministic(DateTime(2024, 1, 15), 10, model, data, io)
-
-# Convert results to Julia arrays
-ds = to_xarray(result)
+ds = data.ARCO()
+model = models.px.FCN.load_model(models.px.FCN.load_default_package())
+backend = io.ZarrBackend("/tmp/forecast.zarr")
+result = run.deterministic(time, 10, model, ds, backend)
 ```
+
+See the [Tutorial](tutorial.qmd) for a longer walkthrough of the interop patterns.

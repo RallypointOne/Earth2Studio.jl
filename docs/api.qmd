@@ -14,26 +14,28 @@ using Earth2Studio
 #| echo: false
 #| output: asis
 export_names = filter(!=(:Earth2Studio), names(Earth2Studio))
+meta = Base.Docs.meta(Earth2Studio)
 
-classify(b) = b isa Type ? :type : b isa Function ? :function : :constant
+function julia_docstring(mod::Module, name::Symbol)
+    b = Base.Docs.Binding(mod, name)
+    haskey(meta, b) || return ""
+    docs = meta[b].docs
+    isempty(docs) && return ""
+    return join(first(values(docs)).text, "")
+end
 
-for (kind, label) in [(:type, "Types"), (:function, "Functions"), (:constant, "Constants")]
-    items = filter(n -> classify(getfield(Earth2Studio, n)) == kind, export_names)
-    isempty(items) && continue
-    println("## $label\n")
-    for name in items
-        binding = getfield(Earth2Studio, name)
-        doc = string(Docs.doc(binding))
-        println("""
-        ::: {.card .mb-3}
-        ::: {.card-header .api-item-header}
-        #### `$name` {#$(lowercase(string(name)))}
-        :::
-        ::: {.card-body}
-        $doc
-        :::
-        :::
-        """)
-    end
+println("## Python module references\n")
+for name in export_names
+    doc = julia_docstring(Earth2Studio, name)
+    println("""
+    ::: {.card .mb-3}
+    ::: {.card-header .api-item-header}
+    #### `$name` {#$(lowercase(string(name)))}
+    :::
+    ::: {.card-body}
+    $doc
+    :::
+    :::
+    """)
 end
 ```

@@ -1,141 +1,100 @@
 using Test
 using Earth2Studio
-using Dates
+using PythonCall: Py, pyconvert, pyhasattr, pyis, pyimport
 
-const HAS_NUMPY = Earth2Studio.is_pymodule_available(:numpy)
-const HAS_EARTH2STUDIO = Earth2Studio.is_pymodule_available(:earth2studio)
-const HAS_DATA = Earth2Studio.is_pymodule_available(:data)
-const HAS_PERTURB = Earth2Studio.is_pymodule_available(:perturbation)
-const HAS_IO = Earth2Studio.is_pymodule_available(:io)
-const HAS_STATS = Earth2Studio.is_pymodule_available(:statistics)
+const EXPORTS = (:earth2studio, :data, :models, :perturbation, :io, :run, :statistics, :utils)
 
 @testset "Earth2Studio" begin
 
-#--------------------------------------------------------------------------------# Module structure
-@testset "module structure" begin
-    @test DataSource <: Earth2Studio.Earth2StudioObject
-    @test PrognosticModel <: Earth2Studio.Earth2StudioObject
-    @test DiagnosticModel <: Earth2Studio.Earth2StudioObject
-    @test Perturbation <: Earth2Studio.Earth2StudioObject
-    @test IOBackend <: Earth2Studio.Earth2StudioObject
-    @test Statistic <: Earth2Studio.Earth2StudioObject
-
-    @test isdefined(Earth2Studio, :run_deterministic)
-    @test isdefined(Earth2Studio, :run_ensemble)
-    @test isdefined(Earth2Studio, :run_diagnostic)
-    @test isdefined(Earth2Studio, :pymodule)
-    @test isdefined(Earth2Studio, :is_pymodule_available)
-    @test isdefined(Earth2Studio, :fetch_data)
-    @test isdefined(Earth2Studio, :to_device!)
-    @test isdefined(Earth2Studio, :to_xarray)
-    @test isdefined(Earth2Studio, :xarray_to_dict)
+#-------------------------------------------------------------------------------# Module surface
+@testset "exported names match expected set" begin
+    exported = Set(filter(!=(:Earth2Studio), names(Earth2Studio)))
+    @test exported == Set(EXPORTS)
 end
 
-#--------------------------------------------------------------------------------# pymodule loader behavior
-@testset "pymodule loader" begin
-    @test_throws Exception Earth2Studio.pymodule(:does_not_exist)
-
-    for key in (:earth2studio, :data, :numpy, :torch, :xarray)
-        @test is_pymodule_available(key) isa Bool
-    end
-    @test !is_pymodule_available(:not_a_real_module)
-
-    for (key, _) in Earth2Studio._SUBMODULES
-        err = Earth2Studio.pymodule_error(key)
-        if is_pymodule_available(key)
-            @test err === nothing
-        else
-            @test err isa Exception
-        end
+@testset "exports are Py references" begin
+    for name in EXPORTS
+        @test isdefined(Earth2Studio, name)
+        @test getfield(Earth2Studio, name) isa Py
     end
 end
 
-#--------------------------------------------------------------------------------# Tests requiring the Python env
-if HAS_NUMPY
-    @testset "time conversions" begin
-        dt = DateTime(2024, 6, 15, 12, 30, 45)
-        np64 = Earth2Studio.datetime_to_np64(dt)
-        @test Earth2Studio.np64_to_datetime(np64) == dt
-
-        d = Date(2024, 1, 1)
-        np64d = Earth2Studio.datetime_to_np64(d)
-        @test Earth2Studio.np64_to_datetime(np64d) == DateTime(d)
-
-        times = [DateTime(2024, 1, 1), DateTime(2024, 1, 1, 6), DateTime(2024, 1, 2)]
-        np64v = Earth2Studio.datetimes_to_np64(times)
-        @test np64v !== nothing
+@testset "every export has a Julia docstring" begin
+    meta = Base.Docs.meta(Earth2Studio)
+    for name in EXPORTS
+        b = Base.Docs.Binding(Earth2Studio, name)
+        @test haskey(meta, b)
+        text = join(meta[b].docs[Union{}].text, "")
+        @test !isempty(strip(text))
     end
 end
 
-if HAS_DATA
-    @testset "data source constructors" begin
-        for (name, ctor) in (
-                ("ARCO", ARCO),
-                ("GFS", GFS),
-                ("GFS_FS", GFS_FS),
-                ("WB2ERA5", WB2ERA5),
-            )
-            @test Earth2Studio.pyhasattr(
-                Earth2Studio.pymodule(:data), Symbol(name)
-            ) === Earth2Studio.pyhasattr(
-                Earth2Studio.pymodule(:data), Symbol(name)
-            )
-        end
+#-------------------------------------------------------------------------------# Submodule wiring
+@testset "submodules resolve to expected dotted names" begin
+    @test pyconvert(String, Earth2Studio.earth2studio.__name__) == "earth2studio"
+    @test pyconvert(String, Earth2Studio.data.__name__)         == "earth2studio.data"
+    @test pyconvert(String, Earth2Studio.models.__name__)       == "earth2studio.models"
+    @test pyconvert(String, Earth2Studio.perturbation.__name__) == "earth2studio.perturbation"
+    @test pyconvert(String, Earth2Studio.io.__name__)           == "earth2studio.io"
+    @test pyconvert(String, Earth2Studio.run.__name__)          == "earth2studio.run"
+    @test pyconvert(String, Earth2Studio.statistics.__name__)   == "earth2studio.statistics"
+    @test pyconvert(String, Earth2Studio.utils.__name__)        == "earth2studio.utils"
+end
+
+@testset "exports are the same Py objects as direct pyimport" begin
+    @test pyis(Earth2Studio.earth2studio, pyimport("earth2studio"))
+    @test pyis(Earth2Studio.data,         pyimport("earth2studio.data"))
+    @test pyis(Earth2Studio.models,       pyimport("earth2studio.models"))
+    @test pyis(Earth2Studio.perturbation, pyimport("earth2studio.perturbation"))
+    @test pyis(Earth2Studio.io,           pyimport("earth2studio.io"))
+    @test pyis(Earth2Studio.run,          pyimport("earth2studio.run"))
+    @test pyis(Earth2Studio.statistics,   pyimport("earth2studio.statistics"))
+    @test pyis(Earth2Studio.utils,        pyimport("earth2studio.utils"))
+end
+
+#-------------------------------------------------------------------------------# Reachable upstream API
+@testset "data submodule" begin
+    for cls in ("ARCO", "GFS", "GFS_FX", "IFS", "CDS", "WB2ERA5", "WB2Climatology", "HRRR", "HRRR_FX", "GOES", "MRMS", "NCAR_ERA5")
+        @test pyhasattr(Earth2Studio.data, cls)
     end
 end
 
-if HAS_PERTURB
-    @testset "perturbation constructors" begin
-        p = Zero()
-        @test p isa Perturbation
-        @test Earth2Studio.py_object(p) !== nothing
-
-        try
-            g = Gaussian()
-            @test g isa Perturbation
-        catch
-        end
+@testset "models.px and models.dx" begin
+    px = Earth2Studio.models.px
+    dx = Earth2Studio.models.dx
+    @test pyconvert(String, px.__name__) == "earth2studio.models.px"
+    @test pyconvert(String, dx.__name__) == "earth2studio.models.dx"
+    for cls in ("FCN", "FCN3", "Pangu24", "Pangu6", "Pangu3", "GraphCastSmall", "AIFS", "Aurora", "Persistence")
+        @test pyhasattr(px, cls)
+    end
+    for cls in ("CorrDiff", "PrecipitationAFNO", "ClimateNet", "DerivedRH", "DerivedVPD", "DerivedWS")
+        @test pyhasattr(dx, cls)
     end
 end
 
-if HAS_IO
-    @testset "IO backend constructors" begin
-        mktempdir() do dir
-            z = ZarrBackend(joinpath(dir, "out.zarr"))
-            @test z isa IOBackend
-            @test Earth2Studio.py_object(z) !== nothing
-        end
+@testset "perturbation submodule" begin
+    for cls in ("Gaussian", "SphericalGaussian", "CorrelatedSphericalGaussian",
+                "Brown", "BredVector", "LaggedEnsemble", "HemisphericCentredBredVector", "Zero")
+        @test pyhasattr(Earth2Studio.perturbation, cls)
     end
 end
 
-if HAS_STATS
-    @testset "statistics constructors" begin
-        for ctor in (RMSE, MSE, MAE)
-            try
-                s = ctor(reduction_dimensions = String[])
-                @test s isa Statistic
-            catch e
-                @test e isa Exception
-            end
-        end
+@testset "io submodule" begin
+    for cls in ("ZarrBackend", "AsyncZarrBackend", "NetCDF4Backend", "XarrayBackend", "KVBackend")
+        @test pyhasattr(Earth2Studio.io, cls)
     end
 end
 
-#--------------------------------------------------------------------------------# Show methods
-@testset "show methods" begin
-    if HAS_PERTURB
-        p = try
-            Zero()
-        catch
-            nothing
-        end
-        if p !== nothing
-            io = IOBuffer()
-            show(io, p)
-            s = String(take!(io))
-            @test contains(s, "Perturbation")
-        end
+@testset "run submodule" begin
+    for fn in ("deterministic", "ensemble", "diagnostic")
+        @test pyhasattr(Earth2Studio.run, fn)
     end
 end
 
-end # top-level testset
+@testset "statistics submodule" begin
+    for fn in ("rmse", "mae", "acc", "crps", "fss", "variance", "mean", "rank_histogram", "brier_score", "spread_skill_ratio", "log_spectral_distance")
+        @test pyhasattr(Earth2Studio.statistics, fn)
+    end
+end
+
+end

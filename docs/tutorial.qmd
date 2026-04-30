@@ -2,193 +2,118 @@
 title: "Tutorial"
 ---
 
-This tutorial walks through a complete weather forecasting workflow with Earth2Studio.jl:
-fetching initial conditions, running a forecast, and visualizing results.
+Earth2Studio.jl re-exports the `earth2studio` Python module and its submodules as `Py` objects. Anything you can do in Python you can do in Julia by calling into these objects via [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl).
 
-::: {.callout-note}
-The earth2studio-dependent cells below are shown but not executed during the docs build (they require
-GPU access and model weights). The plotting cells use synthetic data that mirrors the real output
-structure so the rendered figures are representative of actual forecast products.
-:::
-
-## Setup
+## Exposed names
 
 ```{julia}
 #| eval: false
 using Earth2Studio
-using Dates
+
+earth2studio  # earth2studio
+data          # earth2studio.data
+models        # earth2studio.models  (use models.px and models.dx)
+perturbation  # earth2studio.perturbation
+io            # earth2studio.io
+run           # earth2studio.run
+statistics    # earth2studio.statistics
+utils         # earth2studio.utils
 ```
 
-```{julia}
-#| echo: false
-#| output: false
-using CairoMakie
-using Dates
-using Statistics
-```
+Each is a `PythonCall.Py` reference — attribute access, calls, and conversions work the way they do in PythonCall.
 
-## Step 1: Fetch Initial Conditions
+## Calling into Python
 
-Choose a data source and fetch fields for a given time and set of variables:
-
-```{julia}
-#| eval: false
-ds = WB2ERA5()
-result = fetch_data(ds, DateTime(2024, 6, 15), ["t2m", "u10m", "v10m"])
-
-result.data    # Array{Float32, 4} with dims (time, variable, lat, lon)
-result.dims    # (:time, :variable, :lat, :lon)
-result.coords  # NamedTuple with lat/lon vectors, etc.
-```
-
-## Step 2: Run a Deterministic Forecast
-
-Load a prognostic model and run a 10-step forecast:
+### Data sources
 
 ```{julia}
 #| eval: false
-model = Pangu24()
-to_device!(model, "cuda")
+using Earth2Studio
+using PythonCall  # for pyimport, pyconvert, pylist, etc.
 
-io = ZarrBackend("/tmp/forecast.zarr")
+# Construct a data source
+ds = data.ARCO()
 
-result = run_deterministic(DateTime(2024, 6, 15), 10, model, ds, io)
-ds_out = to_xarray(result)
+# Call its __call__: ds(time, variables) -> xarray.DataArray
+np = pyimport("numpy")
+t  = np.array([np.datetime64("2024-01-01")])
+arr = ds(t, pylist(["t2m", "u10m"]))
 ```
 
-## Step 3: Visualize the Forecast
-
-### Global Temperature Field
-
-A snapshot of 2-meter temperature at a single forecast lead time. Earth2Studio returns data on a
-regular latitude-longitude grid.
-
-```{julia}
-#| label: fig-global-t2m
-#| fig-cap: "2-meter temperature (K) — 24-hour forecast valid 2024-06-16 00Z"
-lat = collect(range(90, -90, length=181))
-lon = collect(range(0, 359, length=360))
-
-# Synthetic T2m field: warm tropics, cold poles, land-sea contrast
-t2m = [
-    280.0 + 25.0 * cosd(la) +
-    3.0 * sind(2lo) * cosd(la) +
-    5.0 * sind(3la) * cosd(2lo) +
-    2.0 * cosd(5lo + 2la)
-    for la in lat, lo in lon
-]
-
-fig = Figure(size=(900, 450))
-ax = Axis(fig[1, 1],
-    xlabel="Longitude (°)", ylabel="Latitude (°)",
-    title="2m Temperature — 24h Forecast (2024-06-16 00Z)",
-)
-hm = heatmap!(ax, lon, lat, t2m', colormap=Reverse(:RdBu), colorrange=(235, 315))
-Colorbar(fig[1, 2], hm, label="Temperature (K)")
-fig
-```
-
-### Forecast Time Series
-
-Track a variable at a single grid point across forecast lead times.
-
-```{julia}
-#| label: fig-timeseries
-#| fig-cap: "48-hour T2m forecast at a single grid point vs. ERA5 analysis"
-hours = 0:6:240
-n = length(hours)
-
-# Synthetic forecast: diurnal cycle + slight warm drift
-t2m_fcst = 288.0 .+ 4.0 .* sin.(2π .* hours ./ 24) .+ 0.015 .* hours .+ 0.8 .* randn(n)
-
-# Synthetic "truth": same diurnal cycle, no drift
-t2m_era5 = 288.0 .+ 4.0 .* sin.(2π .* hours ./ 24) .+ 0.5 .* randn(n)
-
-fig = Figure(size=(800, 400))
-ax = Axis(fig[1, 1],
-    xlabel="Lead time (hours)", ylabel="Temperature (K)",
-    title="T2m Forecast vs. ERA5 — Paris (48.9°N, 2.3°E)",
-)
-lines!(ax, hours, t2m_era5, label="ERA5 analysis", color=:gray30, linewidth=2)
-lines!(ax, hours, t2m_fcst, label="Pangu24 forecast", color=:steelblue, linewidth=2)
-axislegend(ax, position=:lt)
-fig
-```
-
-### Ensemble Spread
-
-Run an ensemble forecast to quantify uncertainty:
+### Prognostic models
 
 ```{julia}
 #| eval: false
-io_ens = ZarrBackend("/tmp/ensemble.zarr")
-perturb = SphericalGaussian()
-result = run_ensemble(DateTime(2024, 6, 15), 40, 10, model, ds, io_ens, perturb)
+# Each model class exposes load_default_package() and load_model()
+pkg   = models.px.FCN.load_default_package()
+model = models.px.FCN.load_model(pkg)
+model.to("cuda")
 ```
 
-Visualize the ensemble envelope:
+### Diagnostic models
 
 ```{julia}
-#| label: fig-ensemble
-#| fig-cap: "10-member ensemble forecast of T2m showing spread growth with lead time"
-hours_ens = 0:6:240
-n_ens = length(hours_ens)
-n_members = 10
-
-# Synthetic ensemble: members diverge over time
-base = 288.0 .+ 4.0 .* sin.(2π .* hours_ens ./ 24)
-members = hcat([base .+ cumsum(0.3 .* randn(n_ens)) for _ in 1:n_members]...)
-
-ens_mean = vec(mean(members, dims=2))
-ens_min = vec(minimum(members, dims=2))
-ens_max = vec(maximum(members, dims=2))
-ens_p25 = vec(mapslices(x -> sort(x)[3], members, dims=2))
-ens_p75 = vec(mapslices(x -> sort(x)[8], members, dims=2))
-
-fig = Figure(size=(800, 400))
-ax = Axis(fig[1, 1],
-    xlabel="Lead time (hours)", ylabel="Temperature (K)",
-    title="Ensemble Forecast — T2m at Paris (48.9°N, 2.3°E)",
-)
-band!(ax, hours_ens, ens_min, ens_max, color=(:steelblue, 0.15), label="Min–Max")
-band!(ax, hours_ens, ens_p25, ens_p75, color=(:steelblue, 0.3), label="25th–75th pct")
-lines!(ax, hours_ens, ens_mean, color=:steelblue, linewidth=2.5, label="Ensemble mean")
-axislegend(ax, position=:lt)
-fig
+#| eval: false
+pkg = models.dx.PrecipitationAFNO.load_default_package()
+dx  = models.dx.PrecipitationAFNO.load_model(pkg)
 ```
 
-### Verification: RMSE by Lead Time
-
-Compare forecast skill across models:
+### Workflows
 
 ```{julia}
-#| label: fig-rmse
-#| fig-cap: "Global RMSE of 500 hPa geopotential height by lead time"
-hours_v = 0:6:240
-n_v = length(hours_v)
+#| eval: false
+using Dates, PythonCall
 
-# Synthetic RMSE curves: persistence grows fast, AI models grow slowly
-rmse_persist = 10.0 .+ 3.5 .* sqrt.(hours_v)
-rmse_pangu   = 10.0 .+ 0.8 .* hours_v .^ 0.65
-rmse_gcst    = 12.0 .+ 0.7 .* hours_v .^ 0.65
-rmse_fcn     = 14.0 .+ 1.0 .* hours_v .^ 0.65
+t = pyimport("numpy").array([pyimport("numpy").datetime64("2024-01-01")])
+backend = io.ZarrBackend("/tmp/forecast.zarr")
 
-fig = Figure(size=(800, 400))
-ax = Axis(fig[1, 1],
-    xlabel="Lead time (hours)", ylabel="RMSE (m²/s²)",
-    title="Z500 RMSE — Global",
-)
-lines!(ax, hours_v, rmse_persist, label="Persistence", color=:gray60, linewidth=2, linestyle=:dash)
-lines!(ax, hours_v, rmse_pangu, label="Pangu24", color=:steelblue, linewidth=2)
-lines!(ax, hours_v, rmse_gcst, label="GraphCast", color=:firebrick, linewidth=2)
-lines!(ax, hours_v, rmse_fcn, label="FourCastNet", color=:goldenrod, linewidth=2)
-axislegend(ax, position=:lt)
-fig
+# Deterministic
+run.deterministic(t, 10, model, ds, backend)
+
+# Ensemble
+perturb = perturbation.SphericalGaussian()
+run.ensemble(t, 10, 4, model, ds, backend, perturb; batch_size=4)
+
+# Diagnostic
+run.diagnostic(t, 10, model, dx, ds, backend)
 ```
 
-## Next Steps
+### IO backends
 
-- Swap `WB2ERA5()` for `GFS()` or `ARCO()` to use different initial condition sources.
-- Try ensemble methods: `Gaussian()`, `BredVector()`, `LaggedEnsemble()`.
-- Add diagnostic models: `run_diagnostic(...)` with `PrecipitationAFNO()` or `CorrDiff()`.
-- Compute verification scores: `RMSE()`, `ACC()`, `CRPS()`.
+```{julia}
+#| eval: false
+io.ZarrBackend("/tmp/out.zarr")
+io.NetCDF4Backend("/tmp/out.nc")
+io.AsyncZarrBackend("/tmp/out.zarr")
+io.XarrayBackend()
+io.KVBackend()
+```
+
+### Statistics
+
+```{julia}
+#| eval: false
+m = statistics.rmse(reduction_dimensions=pylist([]))
+m = statistics.acc(reduction_dimensions=pylist([]))
+m = statistics.crps(ensemble_dimension="ensemble")
+```
+
+## Bringing results back to Julia
+
+Use `PythonCall.pyconvert` to convert Python values to Julia. For arrays, `PyArray` gives a zero-copy view:
+
+```{julia}
+#| eval: false
+using PythonCall
+
+# After a workflow run, an xarray Dataset / DataArray lives on the backend
+xr_dataset = backend.root            # depends on backend type
+
+# Convert a numpy array to a Julia array
+a_jl = pyconvert(Array, xr_dataset["t2m"].values)
+
+# Or a zero-copy view
+a_view = PyArray(xr_dataset["t2m"].values)
+```
+
+Refer to the [PythonCall.jl documentation](https://juliapy.github.io/PythonCall.jl/stable/) for the complete set of conversion utilities, and to the [earth2studio docs](https://nvidia.github.io/earth2studio/) for the Python API itself.

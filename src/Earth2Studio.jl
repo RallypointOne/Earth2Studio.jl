@@ -1,103 +1,82 @@
 module Earth2Studio
 
-using PythonCall: PythonCall, pyimport, pyconvert, Py, pystr, pylist, pytuple, pydict,
-                  pyhasattr, pyis, PyArray
-using Dates: Dates, DateTime, Date
+using PythonCall: PythonCall, Py, pyimport, pynew, pycopy!
 
-# Types
-export DataSource, PrognosticModel, DiagnosticModel, Perturbation, IOBackend, Statistic
+export earth2studio, data, models, perturbation, io, run, statistics, utils
 
-# Data source constructors (earth2studio.data)
-export ARCO, GFS, GFS_FS, IFS, CDS, NCAR_ERA5, WB2ERA5, WB2Climatology, GOES, MRMS, HRRR, HRRR_FX
+#-------------------------------------------------------------------------------# Python module references
+"""
+    earth2studio :: Py
 
-# Prognostic model constructors (earth2studio.models.px)
-export FourCastNet, FCN3, Pangu24, Pangu6, Pangu3, GraphCast, GraphCastOper,
-       AIFS, AIFSENS, Aurora, FengWu, DLWP, StormCast, InterpModAFNO, Persistence
+Top-level [`earth2studio`](https://github.com/NVIDIA/earth2studio) Python module.
+"""
+const earth2studio = pynew()
 
-# Diagnostic model constructors (earth2studio.models.dx)
-export CorrDiff, CorrDiffTaiwan, CorrDiffCMIP6, PrecipitationAFNO, PrecipitationAFNOv2,
-       ClimateNet, DerivedRH, DerivedVPD, DerivedWS, SolarRadiationAFNO1H, SolarRadiationAFNO6H,
-       TCTrackerVitart, TCTrackerWuDuan
+"""
+    data :: Py
 
-# Perturbation methods (earth2studio.perturbation)
-export Gaussian, SphericalGaussian, CorrelatedSphericalGaussian, Brown,
-       BredVector, LaggedEnsemble, HemisphericCentredBredVector, Zero
+`earth2studio.data` — data sources (e.g. `data.ARCO`, `data.GFS`, `data.WB2ERA5`).
+"""
+const data = pynew()
 
-# IO backends (earth2studio.io)
-export ZarrBackend, NetCDF4Backend, AsyncZarrBackend, XarrayBackend, KVBackend
+"""
+    models :: Py
 
-# Statistics (earth2studio.statistics)
-export RMSE, ACC, CRPS, MAE, MSE, FSS, Variance, Mean, SpreadSkillRatio, RankHistogram,
-       BrierScore, LogScore, ReliabilityDiagram
+`earth2studio.models` — prognostic (`models.px`) and diagnostic (`models.dx`) model classes.
+"""
+const models = pynew()
 
-# Run workflows
-export run_deterministic, run_ensemble, run_diagnostic
+"""
+    perturbation :: Py
 
-# Fetch helper
-export fetch_data
+`earth2studio.perturbation` — ensemble perturbation methods (e.g. `perturbation.Gaussian`, `perturbation.BredVector`).
+"""
+const perturbation = pynew()
 
-# Device placement
-export to_device!
+"""
+    io :: Py
 
-# IO utilities
-export to_xarray
+`earth2studio.io` — output backends (e.g. `io.ZarrBackend`, `io.NetCDF4Backend`).
+"""
+const io = pynew()
 
-# Conversion / interop helpers
-export pymodule, py_object, xarray_to_dict, datetime_to_np64, np64_to_datetime
-export is_pymodule_available, pymodule_error
+"""
+    run :: Py
 
-#--------------------------------------------------------------------------------# Lazy Python module table
-const PYMODULES = Dict{Symbol, Union{Py, Exception}}()
+`earth2studio.run` — inference workflows (`run.deterministic`, `run.ensemble`, `run.diagnostic`).
+"""
+const run = pynew()
+
+"""
+    statistics :: Py
+
+`earth2studio.statistics` — verification metrics (e.g. `statistics.rmse`, `statistics.acc`, `statistics.crps`).
+"""
+const statistics = pynew()
+
+"""
+    utils :: Py
+
+`earth2studio.utils` — miscellaneous utilities from the upstream package.
+"""
+const utils = pynew()
 
 const _SUBMODULES = (
-    :earth2studio => "earth2studio",
-    :data         => "earth2studio.data",
-    :models_px    => "earth2studio.models.px",
-    :models_dx    => "earth2studio.models.dx",
-    :perturbation => "earth2studio.perturbation",
-    :io           => "earth2studio.io",
-    :run          => "earth2studio.run",
-    :statistics   => "earth2studio.statistics",
-    :utils        => "earth2studio.utils",
-    :xarray       => "xarray",
-    :numpy        => "numpy",
-    :torch        => "torch",
+    (earth2studio, "earth2studio"),
+    (data,         "earth2studio.data"),
+    (models,       "earth2studio.models"),
+    (perturbation, "earth2studio.perturbation"),
+    (io,           "earth2studio.io"),
+    (run,          "earth2studio.run"),
+    (statistics,   "earth2studio.statistics"),
+    (utils,        "earth2studio.utils"),
 )
 
-function _try_import!(key::Symbol, name::AbstractString)
-    try
-        PYMODULES[key] = pyimport(name)
-    catch e
-        PYMODULES[key] = e
-    end
-    return nothing
-end
-
 function __init__()
-    for (key, name) in _SUBMODULES
-        _try_import!(key, name)
+    for (ref, name) in _SUBMODULES
+        pycopy!(ref, pyimport(name))
     end
     return nothing
 end
-
-function pymodule(key::Symbol)
-    v = get(PYMODULES, key) do
-        error("Earth2Studio: unknown pymodule key :$key. Known: $(keys(PYMODULES))")
-    end
-    v isa Py && return v
-    throw(v)
-end
-
-is_pymodule_available(key::Symbol) = haskey(PYMODULES, key) && PYMODULES[key] isa Py
-pymodule_error(key::Symbol) = haskey(PYMODULES, key) && !(PYMODULES[key] isa Py) ? PYMODULES[key] : nothing
-
-include("convert.jl")
-include("types.jl")
-include("data.jl")
-include("models.jl")
-include("perturbation.jl")
-include("io.jl")
-include("run.jl")
-include("statistics.jl")
 
 end # module

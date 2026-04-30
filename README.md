@@ -5,7 +5,7 @@
 
 # Earth2Studio.jl
 
-A Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) for AI-powered weather and climate forecasting. Run models like Pangu-Weather, GraphCast, FourCastNet, and Aurora from Julia with automatic Python environment management via [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl).
+A thin Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package. The wrapper is intentionally minimal: it imports `earth2studio` and its top-level submodules and re-exports them as [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) `Py` references. All functionality lives upstream — call into it from Julia using PythonCall idioms.
 
 ## Installation
 
@@ -14,23 +14,43 @@ using Pkg
 Pkg.add("Earth2Studio")
 ```
 
-### Python Dependencies
-
-Earth2Studio.jl ships with only lightweight Python dependencies (python, numpy, xarray). You must install the `earth2studio` Python package separately into the Conda environment managed by PythonCall/CondaPkg:
+The Conda environment managed by [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) installs Python, NumPy, and xarray. The `earth2studio` Python package itself must be added separately, with whichever model extras you need:
 
 ```julia
 using CondaPkg
 CondaPkg.add_pip("earth2studio")
-```
-
-To include model-specific extras (e.g., FourCastNet, Pangu-Weather), specify them as pip extras:
-
-```julia
+# or with extras:
 CondaPkg.add_pip("earth2studio[fcn,pangu]")
 ```
 
-Alternatively, to install from source:
+## Usage
 
 ```julia
-CondaPkg.add_pip("earth2studio"; version="@ git+https://github.com/NVIDIA/earth2studio.git")
+using Earth2Studio
+
+earth2studio  # the top-level Python module
+data          # earth2studio.data
+models        # earth2studio.models   (use models.px and models.dx)
+perturbation  # earth2studio.perturbation
+io            # earth2studio.io
+run           # earth2studio.run
+statistics    # earth2studio.statistics
+utils         # earth2studio.utils
 ```
+
+Example — deterministic forecast:
+
+```julia
+using Earth2Studio
+using PythonCall
+
+ds      = data.ARCO()
+pkg     = models.px.FCN.load_default_package()
+model   = models.px.FCN.load_model(pkg)
+backend = io.ZarrBackend("/tmp/forecast.zarr")
+
+t = pyimport("numpy").array([pyimport("numpy").datetime64("2024-01-01")])
+run.deterministic(t, 10, model, ds, backend)
+```
+
+See the [docs](https://RallypointOne.github.io/Earth2Studio.jl/dev/) and the [earth2studio Python documentation](https://nvidia.github.io/earth2studio/) for details on the API surface.
