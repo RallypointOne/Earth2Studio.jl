@@ -7,5 +7,6 @@ xarray = ""
 eccodes = ""
 pygrib = ""
 
-[pip.deps]
-earth2studio = ""
+[pip.deps.earth2studio]
+version = ""
+extras = ["data"]
