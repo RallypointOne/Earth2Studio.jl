@@ -38,19 +38,30 @@ statistics    # earth2studio.statistics
 utils         # earth2studio.utils
 ```
 
+Example — fetch data from ARCO ERA5:
+
+```julia
+using Earth2Studio
+using Dates
+
+ds = data.ARCO()
+da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])   # xarray.DataArray
+```
+
+`DateTime`/`Vector{DateTime}` and `String`/`Vector{String}` are auto-converted to the Python types earth2studio expects (no `numpy` wrapping or `pylist(...)` needed). For `Date`, convert with `DateTime(d)` first — earth2studio mixes `datetime.datetime` and `datetime.date` internally, which Python disallows.
+
 Example — deterministic forecast:
 
 ```julia
 using Earth2Studio
-using PythonCall
+using Dates
 
 ds      = data.ARCO()
 pkg     = models.px.FCN.load_default_package()
 model   = models.px.FCN.load_model(pkg)
 backend = io.ZarrBackend("/tmp/forecast.zarr")
 
-t = pyimport("numpy").array([pyimport("numpy").datetime64("2024-01-01")])
-run.deterministic(t, 10, model, ds, backend)
+run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
 ```
 
 See the [docs](https://RallypointOne.github.io/Earth2Studio.jl/dev/) and the [earth2studio Python documentation](https://nvidia.github.io/earth2studio/) for details on the API surface.

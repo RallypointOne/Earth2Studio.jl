@@ -1,6 +1,7 @@
 using Test
+using Dates
 using Earth2Studio
-using PythonCall: Py, pyconvert, pyhasattr, pyis, pyimport
+using PythonCall: Py, pyconvert, pyhasattr, pyis, pyimport, pybuiltins
 
 const EXPORTS = (:earth2studio, :data, :models, :perturbation, :io, :run, :statistics, :utils)
 
@@ -95,6 +96,30 @@ end
     for fn in ("rmse", "mae", "acc", "crps", "fss", "variance", "mean", "rank_histogram", "brier_score", "spread_skill_ratio", "log_spectral_distance")
         @test pyhasattr(Earth2Studio.statistics, fn)
     end
+end
+
+#-------------------------------------------------------------------------------# Auto-conversion of Julia types
+@testset "DateTime / String auto-conversion" begin
+    py_datetime = pyimport("datetime").datetime
+    py_str = pybuiltins.str
+
+    # Single DateTime -> datetime.datetime
+    p = Py(DateTime(2023, 6, 15, 12, 30))
+    @test pyconvert(Bool, pybuiltins.isinstance(p, py_datetime))
+
+    # Vector{DateTime} -> iterable yielding datetime.datetime
+    pv = Py([DateTime(2023, 6, 15), DateTime(2023, 6, 16)])
+    @test pyconvert(Int, pybuiltins.len(pv)) == 2
+    @test pyconvert(Bool, pybuiltins.isinstance(pv[0], py_datetime))
+    @test pyconvert(Bool, pybuiltins.isinstance(pv[1], py_datetime))
+
+    # String -> str
+    @test pyconvert(Bool, pybuiltins.isinstance(Py("t2m"), py_str))
+
+    # Vector{String} -> iterable yielding str
+    pv = Py(["t2m", "u10m"])
+    @test pyconvert(Int, pybuiltins.len(pv)) == 2
+    @test pyconvert(Bool, pybuiltins.isinstance(pv[0], py_str))
 end
 
 end

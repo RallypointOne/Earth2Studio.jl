@@ -22,35 +22,62 @@ utils         # earth2studio.utils
 
 Each is a `PythonCall.Py` reference — attribute access, calls, and conversions work the way they do in PythonCall.
 
-## Calling into Python
+## Auto-conversion of common Julia types
 
-### Data sources
+PythonCall handles the conversions you most often need at call sites:
+
+| Julia               | Python                          |
+|---------------------|---------------------------------|
+| `DateTime`          | `datetime.datetime`             |
+| `Vector{DateTime}`  | `list[datetime.datetime]`       |
+| `String`            | `str`                           |
+| `Vector{String}`    | `list[str]`                     |
+
+So you can pass these directly:
 
 ```{julia}
 #| eval: false
 using Earth2Studio
-using PythonCall  # for pyimport, pyconvert, pylist, etc.
+using Dates
 
-# Construct a data source
 ds = data.ARCO()
-
-# Call its __call__: ds(time, variables) -> xarray.DataArray
-np = pyimport("numpy")
-t  = np.array([np.datetime64("2024-01-01")])
-arr = ds(t, pylist(["t2m", "u10m"]))
+da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])             # one time
+da = ds([DateTime(2023, 6, 15), DateTime(2023, 6, 16)], "t2m")  # several
 ```
 
-### Prognostic models
+Two practical caveats:
+
+- `Date` (no time component) is converted to Python's `datetime.date`, which earth2studio mixes with `datetime.datetime` internally and triggers `TypeError`. Wrap with `DateTime(d)` first.
+- If a Python API specifically wants a `numpy.datetime64` array (some lower-level entry points do), build it explicitly: `pyimport("numpy").array([pyimport("numpy").datetime64("2023-06-15T00:00:00")])`.
+
+## Fetching data
 
 ```{julia}
 #| eval: false
-# Each model class exposes load_default_package() and load_model()
+using Earth2Studio
+using PythonCall: pyconvert, PyArray
+using Dates
+
+ds = data.ARCO()
+da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])
+
+pyconvert(Tuple, da.dims)        # ("time", "variable", "lat", "lon")
+pyconvert(Tuple, da.shape)       # (1, 2, 721, 1440)
+
+arr = PyArray(da.values)         # zero-copy PyArray{Float64, 4}
+t2m = arr[1, 1, :, :]            # 721 × 1440 lat × lon Kelvin
+```
+
+## Prognostic models
+
+```{julia}
+#| eval: false
 pkg   = models.px.FCN.load_default_package()
 model = models.px.FCN.load_model(pkg)
 model.to("cuda")
 ```
 
-### Diagnostic models
+## Diagnostic models
 
 ```{julia}
 #| eval: false
@@ -58,27 +85,26 @@ pkg = models.dx.PrecipitationAFNO.load_default_package()
 dx  = models.dx.PrecipitationAFNO.load_model(pkg)
 ```
 
-### Workflows
+## Workflows
 
 ```{julia}
 #| eval: false
-using Dates, PythonCall
+using Dates
 
-t = pyimport("numpy").array([pyimport("numpy").datetime64("2024-01-01")])
 backend = io.ZarrBackend("/tmp/forecast.zarr")
 
 # Deterministic
-run.deterministic(t, 10, model, ds, backend)
+run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
 
 # Ensemble
 perturb = perturbation.SphericalGaussian()
-run.ensemble(t, 10, 4, model, ds, backend, perturb; batch_size=4)
+run.ensemble([DateTime(2023, 6, 15)], 10, 4, model, ds, backend, perturb; batch_size=4)
 
 # Diagnostic
-run.diagnostic(t, 10, model, dx, ds, backend)
+run.diagnostic([DateTime(2023, 6, 15)], 10, model, dx, ds, backend)
 ```
 
-### IO backends
+## IO backends
 
 ```{julia}
 #| eval: false
@@ -89,31 +115,24 @@ io.XarrayBackend()
 io.KVBackend()
 ```
 
-### Statistics
+## Statistics
 
 ```{julia}
 #| eval: false
-m = statistics.rmse(reduction_dimensions=pylist([]))
-m = statistics.acc(reduction_dimensions=pylist([]))
+m = statistics.rmse(reduction_dimensions=["time"])
+m = statistics.acc(reduction_dimensions=["time"])
 m = statistics.crps(ensemble_dimension="ensemble")
 ```
 
 ## Bringing results back to Julia
 
-Use `PythonCall.pyconvert` to convert Python values to Julia. For arrays, `PyArray` gives a zero-copy view:
-
 ```{julia}
 #| eval: false
 using PythonCall
 
-# After a workflow run, an xarray Dataset / DataArray lives on the backend
-xr_dataset = backend.root            # depends on backend type
-
-# Convert a numpy array to a Julia array
-a_jl = pyconvert(Array, xr_dataset["t2m"].values)
-
-# Or a zero-copy view
-a_view = PyArray(xr_dataset["t2m"].values)
+# numpy / xarray array → Julia
+a_jl   = pyconvert(Array, da.values)   # copies
+a_view = PyArray(da.values)            # zero-copy view
 ```
 
-Refer to the [PythonCall.jl documentation](https://juliapy.github.io/PythonCall.jl/stable/) for the complete set of conversion utilities, and to the [earth2studio docs](https://nvidia.github.io/earth2studio/) for the Python API itself.
+Refer to the [PythonCall.jl docs](https://juliapy.github.io/PythonCall.jl/stable/) for more conversion utilities, and to the [earth2studio docs](https://nvidia.github.io/earth2studio/) for the Python API itself.

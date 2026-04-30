@@ -29,11 +29,14 @@ Then call into the Python API:
 
 ```julia
 using Earth2Studio
+using Dates
 
 ds = data.ARCO()
-model = models.px.FCN.load_model(models.px.FCN.load_default_package())
+da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])
+
+model   = models.px.FCN.load_model(models.px.FCN.load_default_package())
 backend = io.ZarrBackend("/tmp/forecast.zarr")
-result = run.deterministic(time, 10, model, ds, backend)
+run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
 ```
 
-See the [Tutorial](tutorial.qmd) for a longer walkthrough of the interop patterns.
+`DateTime`/`Vector{DateTime}` and `String`/`Vector{String}` are auto-converted to the Python types earth2studio expects — no `numpy` wrapping or `pylist(...)` needed. See the [Tutorial](tutorial.qmd) for the full set of interop patterns.
