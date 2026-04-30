@@ -1,9 +1,11 @@
 channels = ["conda-forge"]
 
 [deps]
-xarray = ""
+python = ">=3.10,<3.14"
 numpy = ""
-python = ">=3.10"
+xarray = ""
+eccodes = ""
+pygrib = ""
 
 [pip.deps]
 earth2studio = ""
