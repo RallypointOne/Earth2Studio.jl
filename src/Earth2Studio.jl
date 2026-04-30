@@ -1,6 +1,6 @@
 module Earth2Studio
 
-using PythonCall: PythonCall, Py, pyimport, pynew, pycopy!
+using PythonCall: PythonCall, Py, pyimport, pyconvert, pynew, pycopy!
 
 export earth2studio, data, models, perturbation, io, run, statistics, utils
 
@@ -73,8 +73,39 @@ const _SUBMODULES = (
 )
 
 function __init__()
+    _ensure_ssl_cert_file()
     for (ref, name) in _SUBMODULES
         pycopy!(ref, pyimport(name))
+    end
+    return nothing
+end
+
+# Conda Python on macOS often ships an OpenSSL whose compiled-in CA path
+# doesn't resolve when the env lives under .julia/dev/.../.CondaPkg/.pixi/...
+# The cert bundle is at <sys.prefix>/ssl/cert.pem; point Python at it so
+# remote data sources (ARCO, WB2ERA5, CDS, ...) can complete TLS handshakes.
+# Updates both Julia's ENV and Python's os.environ — Python initialises its
+# environ snapshot at interpreter startup and will not see vars Julia sets
+# afterwards. This must run before importing earth2studio, because libraries in
+# the data-source stack may cache SSL defaults at import time. Honors any
+# pre-set SSL_CERT_FILE / REQUESTS_CA_BUNDLE.
+function _ensure_ssl_cert_file()
+    pyos = try
+        pyimport("os")
+    catch
+        return
+    end
+    pyenv_has(k) = pyconvert(Bool, pyos.environ.__contains__(k))
+    (haskey(ENV, "SSL_CERT_FILE") || haskey(ENV, "REQUESTS_CA_BUNDLE") ||
+     pyenv_has("SSL_CERT_FILE") || pyenv_has("REQUESTS_CA_BUNDLE")) && return
+    cert = try
+        joinpath(pyconvert(String, pyimport("sys").prefix), "ssl", "cert.pem")
+    catch
+        return
+    end
+    if isfile(cert)
+        ENV["SSL_CERT_FILE"] = cert
+        pyos.environ["SSL_CERT_FILE"] = cert
     end
     return nothing
 end
