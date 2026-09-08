@@ -1,0 +1,112 @@
+---
+title: "Forecasting"
+---
+
+A forecast in earth2studio has three parts: a data source that supplies the initial condition, a prognostic model that steps the atmospheric state forward in time, and an IO backend that stores each step. `Earth2Studio.run.deterministic` connects them. This tutorial runs that workflow from Julia and then verifies the forecast against ERA5.
+
+The model used here is `models.px.Persistence`, which returns the initial condition at every lead time. It has no weights and needs no GPU, so the page executes during the docs build. Replacing it with a trained model changes one line; see [Trained models](#trained-models).
+
+```{julia}
+#| echo: false
+#| output: false
+# Spawn multiprocessing's resource_tracker with stdio detached so the docs build does not
+# hang on the first zarr chunk decode. See index.qmd for details.
+using PythonCall: pyimport
+redirect_stdio(stdout=devnull, stderr=devnull) do
+    pyimport("multiprocessing.resource_tracker").ensure_running()
+end
+```
+
+```{julia}
+using Earth2Studio
+using Dates
+using CairoMakie
+using PythonCall: pyimport, pyconvert, pydict, pylist
+```
+
+## Data source
+
+ARCO ERA5 supplies the initial condition. `verbose=false` turns off the download progress bar.
+
+```{julia}
+ds = Earth2Studio.data.ARCO(verbose=false)
+t0 = DateTime(2023, 6, 15)
+```
+
+## Prognostic model
+
+A prognostic model declares the variables and grid it operates on. `Persistence` takes both as constructor arguments; a trained model reads them from its checkpoint. The grid below is the 0.25° ERA5 grid with latitude descending from 90 to -90, matching ARCO. Dimension order follows the dict's insertion order, which `pydict` preserves.
+
+```{julia}
+np = pyimport("numpy")
+grid = pydict("lat" => np.linspace(90, -90, 721), "lon" => np.linspace(0, 359.75, 1440))
+model = Earth2Studio.models.px.Persistence("t2m", grid)
+pyconvert(Vector{String}, model.input_coords().keys())
+```
+
+## Running the forecast
+
+`run.deterministic(time, nsteps, model, data, io)` fetches the initial condition at each `time`, steps the model `nsteps` times, and writes every step to `io`. `XarrayBackend` keeps the output in memory as an `xarray.Dataset` in its `root` field. `ZarrBackend` and `NetCDF4Backend` write to disk and take the same call.
+
+```{julia}
+io = Earth2Studio.io.XarrayBackend()
+Earth2Studio.run.deterministic([t0], 4, model, ds, io; verbose=false)
+print(io.root)
+```
+
+Each variable is a `(time, lead_time, lat, lon)` array. `Persistence` steps by 6 h, so four steps give lead times 0 to 24 h.
+
+## Verification against ERA5
+
+Fetch ERA5 at the valid times, bring both arrays to Julia, and compute area-weighted RMSE at each lead time. The weights are proportional to `cos(lat)` so that grid cells near the poles do not dominate.
+
+The list of times is converted with `pylist` rather than passed as a Julia vector. Data sources iterate their arguments on a background Python thread, and iterating a Julia vector there calls back into Julia from a thread it does not own, which can deadlock the process. See [Auto-conversion of common Julia types](basics.qmd#auto-conversion-of-common-julia-types).
+
+```{julia}
+valid = t0 .+ Hour.(0:6:24)
+obs = ds(pylist(valid), "t2m")
+
+fc  = pyconvert(Array, io.root["t2m"].values)[1, :, :, :]   # lead_time × lat × lon
+era = pyconvert(Array, obs.values)[:, 1, :, :]              # time × lat × lon
+lat = pyconvert(Vector, obs.lat.values)
+lon = pyconvert(Vector, obs.lon.values)
+
+w = cosd.(lat) / sum(cosd.(lat))
+wrmse(err) = sqrt(sum(w .* vec(sum(abs2, err; dims=2))) / length(lon))
+[(lead_time=h, rmse=wrmse(fc[i, :, :] - era[i, :, :])) for (i, h) in enumerate(0:6:24)]
+```
+
+The error peaks at 12 h and falls again at 24 h. For 2 m temperature the diurnal cycle dominates a persistence forecast at these lead times, so the forecast is closest to ERA5 at the same time of day as the initial condition. The map of the 24 h error shows the synoptic changes that remain.
+
+```{julia}
+err24 = fc[end, :, :] - era[end, :, :]
+
+fig = Figure(size=(900, 450))
+ax = Axis(fig[1, 1]; title="Persistence − ERA5, 2 m temperature, +24 h", xlabel="Longitude", ylabel="Latitude")
+hm = heatmap!(ax, lon, lat, permutedims(err24); colormap=:balance, colorrange=(-8, 8))
+Colorbar(fig[1, 2], hm; label="K")
+fig
+```
+
+## Trained models
+
+Trained models ship as a *package*: weights plus configuration, downloaded from NGC or Hugging Face on first use. Each needs its model extra in `CondaPkg.toml` and, in practice, a GPU. For FourCastNet:
+
+```toml
+[pip.deps.earth2studio]
+extras = ["fcn"]
+```
+
+The rest of the pipeline is unchanged. The model's `input_coords()` reports the variables and grid it expects, and `run.deterministic` fetches exactly those from the data source.
+
+```{julia}
+#| eval: false
+pkg   = Earth2Studio.models.px.FCN.load_default_package()
+model = Earth2Studio.models.px.FCN.load_model(pkg)
+model.input_coords()["variable"]
+
+io = Earth2Studio.io.ZarrBackend("forecast.zarr")
+Earth2Studio.run.deterministic([t0], 20, model, ds, io)   # 20 × 6 h = 5 days
+```
+
+`run.deterministic` runs on CUDA when available and on CPU otherwise; pass `device` to override. The available models are listed in the upstream [model documentation](https://nvidia.github.io/earth2studio/main/modules/models.html). For ensemble forecasts, see `Earth2Studio.run.ensemble` in the [Basics](basics.qmd#workflows) tutorial.

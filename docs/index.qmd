@@ -17,12 +17,13 @@ On first `using Earth2Studio`, [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg
 extras = ["fcn", "pangu"]
 ```
 
-Every reference is accessed through the module, e.g. `Earth2Studio.data`. `DateTime` and `String` convert to the Python types earth2studio expects, and Julia vectors are accepted wherever earth2studio iterates over a list. See the [Tutorial](tutorial.qmd) for the full set of interop patterns and for running forecast models.
+Every reference is accessed through the module, e.g. `Earth2Studio.data`. `DateTime` and `String` convert to the Python types earth2studio expects. See the [Basics](tutorials/basics.qmd) tutorial for the full set of interop patterns, including when a Julia vector must be converted with `pylist`, and the [Forecasting](tutorials/forecasting.qmd) tutorial for running a model.
 
 Fetch a field from ARCO ERA5, bring it back to Julia with [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl), and plot it with [CairoMakie](https://docs.makie.org):
 
 ```{julia}
 #| echo: false
+#| output: false
 # On first zarr chunk decode, numcodecs creates a multiprocessing.Lock, which spawns a
 # resource_tracker subprocess. That child inherits the stdout/stderr pipe the notebook
 # runner uses to capture cell output and keeps it open, so the render hangs waiting for

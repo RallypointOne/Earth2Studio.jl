@@ -1,5 +1,5 @@
 ---
-title: "Tutorial"
+title: "Basics"
 ---
 
 Earth2Studio.jl holds the `earth2studio` Python module and its submodules as `Py` objects. Anything you can do in Python you can do in Julia by calling into these objects via [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl).
@@ -41,33 +41,41 @@ PythonCall handles the conversions you most often need at call sites:
 | `String`            | `str`                                                    |
 | `Vector{String}`    | `juliacall.VectorValue` yielding `str`                   |
 
-A `juliacall.VectorValue` is not a Python `list`, but it supports `len`, indexing, and iteration, which is all earth2studio does with these arguments. So you can pass Julia vectors directly:
+A `juliacall.VectorValue` is not a Python `list`, but it supports `len`, indexing, and iteration. Each of those calls back into Julia. That is safe on the main thread, which is where the `run` workflows convert their `time` argument, so Julia vectors can be passed to them directly:
+
+```{julia}
+#| eval: false
+Earth2Studio.run.deterministic([DateTime(2023, 6, 15), DateTime(2023, 6, 16)], 10, model, ds, backend)
+```
+
+Data sources are different: they iterate `time` and `variable` inside an async fetch that runs on fsspec's background IO thread. A callback into Julia from a thread Julia does not own can deadlock the process (Julia's garbage collector waits for the main thread to reach a safepoint while the main thread waits for Python's GIL). Convert with `pylist` before calling a data source:
 
 ```{julia}
 #| eval: false
 using Earth2Studio
 using Dates
+using PythonCall: pylist
 
 ds = Earth2Studio.data.ARCO()
-da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])                # one time
-da = ds([DateTime(2023, 6, 15), DateTime(2023, 6, 16)], "t2m")  # several
+da = ds(DateTime(2023, 6, 15), pylist(["t2m", "u10m"]))                # one time
+da = ds(pylist([DateTime(2023, 6, 15), DateTime(2023, 6, 16)]), "t2m")  # several
 ```
 
 Two practical caveats:
 
 - `Date` (no time component) is converted to Python's `datetime.date`, which earth2studio mixes with `datetime.datetime` internally and triggers `TypeError`. Wrap with `DateTime(d)` first.
-- If a Python API specifically wants a real `list` or a `numpy.datetime64` array, build it explicitly with `pylist(...)` or `pyimport("numpy").array(...)`.
+- If a Python API specifically wants a `numpy.datetime64` array, build it explicitly with `pyimport("numpy").array(...)`.
 
 ## Fetching data
 
 ```{julia}
 #| eval: false
 using Earth2Studio
-using PythonCall: pyconvert, PyArray
+using PythonCall: pyconvert, pylist, PyArray
 using Dates
 
 ds = Earth2Studio.data.ARCO()
-da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])
+da = ds(DateTime(2023, 6, 15), pylist(["t2m", "u10m"]))
 
 pyconvert(Tuple, da.dims)        # ("time", "variable", "lat", "lon")
 pyconvert(Tuple, da.shape)       # (1, 2, 721, 1440)

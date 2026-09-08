@@ -25,7 +25,10 @@ book:
     - part: "Docs"
       chapters:
         - index.qmd
-        - tutorial.qmd
+    - part: "Tutorials"
+      chapters:
+        - tutorials/basics.qmd
+        - tutorials/forecasting.qmd
     - part: "API"
       chapters:
         - api.qmd
