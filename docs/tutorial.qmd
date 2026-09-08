@@ -76,6 +76,26 @@ arr = PyArray(da.values)         # zero-copy PyArray{Float64, 4}
 t2m = arr[1, 1, :, :]            # 721 × 1440 lat × lon Kelvin
 ```
 
+## Variable names
+
+earth2studio uses one set of short variable names across all data sources: surface fields such as `t2m`, `u10m`, `msl`, `tp`, and pressure-level fields written as `<variable><level>`, e.g. `t850`, `z500`, `q700`. Each data source has a lexicon class in `earth2studio.lexicon` whose `VOCAB` dict maps these names to the source's native names, so its keys are the variables that source can provide. See the upstream [lexicon guide](https://nvidia.github.io/earth2studio/main/userguide/advanced/lexicon/) for the full naming convention.
+
+```{julia}
+#| eval: false
+using Earth2Studio
+using PythonCall: pyconvert, pycontains
+
+lex = Earth2Studio.earth2studio.lexicon
+
+vocab = lex.ARCOLexicon.VOCAB
+length(vocab)                                    # 1436
+pyconvert(Vector{String}, vocab.keys())[1:5]     # ["u10m", "v10m", "u100m", "v100m", "t2m"]
+pycontains(vocab, "t850")                        # true
+
+vocab["z500"]                                    # "geopotential::500"
+lex.GFSLexicon.VOCAB["z500"]                     # "HGT::500 mb"
+```
+
 ## Prognostic models
 
 ```{julia}
