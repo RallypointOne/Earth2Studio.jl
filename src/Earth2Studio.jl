@@ -1,103 +1,61 @@
 module Earth2Studio
 
-using PythonCall: PythonCall, Py, pyimport, pyconvert, pynew, pycopy!
-
-export earth2studio, data, models, perturbation, io, run, statistics, utils
+using PythonCall: PythonCall, Py, pyimport, pyconvert, pynew, pycopy!, pycontains
 
 #-------------------------------------------------------------------------------# Python module references
 """
-    earth2studio :: Py
+    Earth2Studio.earth2studio :: Py
 
 Top-level [`earth2studio`](https://github.com/NVIDIA/earth2studio) Python module.
 """
 const earth2studio = pynew()
 
-"""
-    data :: Py
-
-`earth2studio.data` — data sources (e.g. `data.ARCO`, `data.GFS`, `data.WB2ERA5`).
-"""
-const data = pynew()
-
-"""
-    models :: Py
-
-`earth2studio.models` — prognostic (`models.px`) and diagnostic (`models.dx`) model classes.
-"""
-const models = pynew()
-
-"""
-    perturbation :: Py
-
-`earth2studio.perturbation` — ensemble perturbation methods (e.g. `perturbation.Gaussian`, `perturbation.BredVector`).
-"""
-const perturbation = pynew()
-
-"""
-    io :: Py
-
-`earth2studio.io` — output backends (e.g. `io.ZarrBackend`, `io.NetCDF4Backend`).
-"""
-const io = pynew()
-
-"""
-    run :: Py
-
-`earth2studio.run` — inference workflows (`run.deterministic`, `run.ensemble`, `run.diagnostic`).
-"""
-const run = pynew()
-
-"""
-    statistics :: Py
-
-`earth2studio.statistics` — verification metrics (e.g. `statistics.rmse`, `statistics.acc`, `statistics.crps`).
-"""
-const statistics = pynew()
-
-"""
-    utils :: Py
-
-`earth2studio.utils` — miscellaneous utilities from the upstream package.
-"""
-const utils = pynew()
-
-const _SUBMODULES = (
-    (earth2studio, "earth2studio"),
-    (data,         "earth2studio.data"),
-    (models,       "earth2studio.models"),
-    (perturbation, "earth2studio.perturbation"),
-    (io,           "earth2studio.io"),
-    (run,          "earth2studio.run"),
-    (statistics,   "earth2studio.statistics"),
-    (utils,        "earth2studio.utils"),
+# Top-level submodules of `earth2studio` exposed as `Earth2Studio.<name>`
+const SUBMODULES = (
+    :data         => "data sources (e.g. `data.ARCO`, `data.GFS`, `data.WB2ERA5`)",
+    :models       => "prognostic (`models.px`) and diagnostic (`models.dx`) model classes",
+    :perturbation => "ensemble perturbation methods (e.g. `perturbation.Gaussian`, `perturbation.BredVector`)",
+    :io           => "output backends (e.g. `io.ZarrBackend`, `io.NetCDF4Backend`)",
+    :run          => "inference workflows (`run.deterministic`, `run.ensemble`, `run.diagnostic`)",
+    :statistics   => "verification metrics (e.g. `statistics.rmse`, `statistics.acc`, `statistics.crps`)",
+    :utils        => "miscellaneous utilities from the upstream package",
 )
+
+for (name, desc) in SUBMODULES
+    @eval @doc $("    Earth2Studio.$name :: Py\n\n`earth2studio.$name` — $desc.") const $name = pynew()
+end
 
 function __init__()
     _ensure_ssl_cert_file()
-    for (ref, name) in _SUBMODULES
-        pycopy!(ref, pyimport(name))
+    pycopy!(earth2studio, pyimport("earth2studio"))
+    for (name, _) in SUBMODULES
+        pycopy!(getfield(@__MODULE__, name), pyimport("earth2studio.$name"))
     end
     return nothing
 end
 
-# Conda Python on macOS often ships an OpenSSL whose compiled-in CA path
-# doesn't resolve when the env lives under .julia/dev/.../.CondaPkg/.pixi/...
-# The cert bundle is at <sys.prefix>/ssl/cert.pem; point Python at it so
-# remote data sources (ARCO, WB2ERA5, CDS, ...) can complete TLS handshakes.
-# Updates both Julia's ENV and Python's os.environ — Python initialises its
-# environ snapshot at interpreter startup and will not see vars Julia sets
-# afterwards. This must run before importing earth2studio, because libraries in
-# the data-source stack may cache SSL defaults at import time. Honors any
-# pre-set SSL_CERT_FILE / REQUESTS_CA_BUNDLE.
+#----------------------------------------------------------------------------# ensure_ssl_cert_file
+# Make HTTPS work for Python inside the CondaPkg environment on macOS.
+#
+# Problem: The OpenSSL bundled with Conda Python on macOS looks for its trusted root certificates
+# (the CA bundle) at a path fixed at build time. That path does not exist when the environment is
+# installed under .CondaPkg/, so every TLS connection fails with a certificate verification error.
+# This breaks remote data sources (ARCO, WB2ERA5, CDS, ...).
+#
+# Details:
+# - Set it in Python's os.environ, not Julia's ENV. os.environ also calls
+#   putenv, so OpenSSL sees it, while Julia's own HTTPS clients are unaffected.
+# - Must run before importing earth2studio; some libraries in its data-source
+#   stack read SSL settings at import time and cache them.
 function _ensure_ssl_cert_file()
-    haskey(ENV, "SSL_CERT_FILE") && return
+    environ = pyimport("os").environ
+    pycontains(environ, "SSL_CERT_FILE") && return  # If user already set, ignore
     cert = try
-        pyconvert(String, pyimport("certifi").where())
+        pyconvert(String, pyimport("certifi").where())  # Use certifi's SSL_CERT_FILE
     catch
         return
     end
-    ENV["SSL_CERT_FILE"] = cert
-    pyimport("os").environ["SSL_CERT_FILE"] = cert
+    environ["SSL_CERT_FILE"] = cert
     return
 end
 

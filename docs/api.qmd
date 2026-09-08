@@ -13,7 +13,9 @@ using Earth2Studio
 ```{julia}
 #| echo: false
 #| output: asis
-export_names = filter(!=(:Earth2Studio), names(Earth2Studio))
+py_names = filter(names(Earth2Studio; all=true)) do n
+    isdefined(Earth2Studio, n) && getfield(Earth2Studio, n) isa Earth2Studio.Py
+end
 meta = Base.Docs.meta(Earth2Studio)
 
 function julia_docstring(mod::Module, name::Symbol)
@@ -25,12 +27,13 @@ function julia_docstring(mod::Module, name::Symbol)
 end
 
 println("## Python module references\n")
-for name in export_names
+println("Nothing is exported. Access each reference as `Earth2Studio.<name>`.\n")
+for name in py_names
     doc = julia_docstring(Earth2Studio, name)
     println("""
     ::: {.card .mb-3}
     ::: {.card-header .api-item-header}
-    #### `$name` {#$(lowercase(string(name)))}
+    #### `Earth2Studio.$name` {#$(lowercase(string(name)))}
     :::
     ::: {.card-body}
     $doc

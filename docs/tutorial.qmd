@@ -2,53 +2,61 @@
 title: "Tutorial"
 ---
 
-Earth2Studio.jl re-exports the `earth2studio` Python module and its submodules as `Py` objects. Anything you can do in Python you can do in Julia by calling into these objects via [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl).
+Earth2Studio.jl holds the `earth2studio` Python module and its submodules as `Py` objects. Anything you can do in Python you can do in Julia by calling into these objects via [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl).
 
-## Exposed names
+## Module references
+
+Nothing is exported (upstream names such as `run` and `io` would clash with `Base`), so every reference is accessed through the module:
 
 ```{julia}
 #| eval: false
 using Earth2Studio
 
-earth2studio  # earth2studio
-data          # earth2studio.data
-models        # earth2studio.models  (use models.px and models.dx)
-perturbation  # earth2studio.perturbation
-io            # earth2studio.io
-run           # earth2studio.run
-statistics    # earth2studio.statistics
-utils         # earth2studio.utils
+Earth2Studio.earth2studio  # earth2studio
+Earth2Studio.data          # earth2studio.data
+Earth2Studio.models        # earth2studio.models  (use models.px and models.dx)
+Earth2Studio.perturbation  # earth2studio.perturbation
+Earth2Studio.io            # earth2studio.io
+Earth2Studio.run           # earth2studio.run
+Earth2Studio.statistics    # earth2studio.statistics
+Earth2Studio.utils         # earth2studio.utils
 ```
 
-Each is a `PythonCall.Py` reference — attribute access, calls, and conversions work the way they do in PythonCall.
+Each is a `PythonCall.Py` reference — attribute access, calls, and conversions work the way they do in PythonCall. For shorter code, alias the module:
+
+```{julia}
+#| eval: false
+import Earth2Studio as E2S
+E2S.data.ARCO()
+```
 
 ## Auto-conversion of common Julia types
 
 PythonCall handles the conversions you most often need at call sites:
 
-| Julia               | Python                          |
-|---------------------|---------------------------------|
-| `DateTime`          | `datetime.datetime`             |
-| `Vector{DateTime}`  | `list[datetime.datetime]`       |
-| `String`            | `str`                           |
-| `Vector{String}`    | `list[str]`                     |
+| Julia               | Python                                                   |
+|---------------------|----------------------------------------------------------|
+| `DateTime`          | `datetime.datetime`                                      |
+| `Vector{DateTime}`  | `juliacall.VectorValue` yielding `datetime.datetime`     |
+| `String`            | `str`                                                    |
+| `Vector{String}`    | `juliacall.VectorValue` yielding `str`                   |
 
-So you can pass these directly:
+A `juliacall.VectorValue` is not a Python `list`, but it supports `len`, indexing, and iteration, which is all earth2studio does with these arguments. So you can pass Julia vectors directly:
 
 ```{julia}
 #| eval: false
 using Earth2Studio
 using Dates
 
-ds = data.ARCO()
-da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])             # one time
+ds = Earth2Studio.data.ARCO()
+da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])                # one time
 da = ds([DateTime(2023, 6, 15), DateTime(2023, 6, 16)], "t2m")  # several
 ```
 
 Two practical caveats:
 
 - `Date` (no time component) is converted to Python's `datetime.date`, which earth2studio mixes with `datetime.datetime` internally and triggers `TypeError`. Wrap with `DateTime(d)` first.
-- If a Python API specifically wants a `numpy.datetime64` array (some lower-level entry points do), build it explicitly: `pyimport("numpy").array([pyimport("numpy").datetime64("2023-06-15T00:00:00")])`.
+- If a Python API specifically wants a real `list` or a `numpy.datetime64` array, build it explicitly with `pylist(...)` or `pyimport("numpy").array(...)`.
 
 ## Fetching data
 
@@ -58,7 +66,7 @@ using Earth2Studio
 using PythonCall: pyconvert, PyArray
 using Dates
 
-ds = data.ARCO()
+ds = Earth2Studio.data.ARCO()
 da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])
 
 pyconvert(Tuple, da.dims)        # ("time", "variable", "lat", "lon")
@@ -72,8 +80,8 @@ t2m = arr[1, 1, :, :]            # 721 × 1440 lat × lon Kelvin
 
 ```{julia}
 #| eval: false
-pkg   = models.px.FCN.load_default_package()
-model = models.px.FCN.load_model(pkg)
+pkg   = Earth2Studio.models.px.FCN.load_default_package()
+model = Earth2Studio.models.px.FCN.load_model(pkg)
 model.to("cuda")
 ```
 
@@ -81,8 +89,8 @@ model.to("cuda")
 
 ```{julia}
 #| eval: false
-pkg = models.dx.PrecipitationAFNO.load_default_package()
-dx  = models.dx.PrecipitationAFNO.load_model(pkg)
+pkg = Earth2Studio.models.dx.PrecipitationAFNO.load_default_package()
+dx  = Earth2Studio.models.dx.PrecipitationAFNO.load_model(pkg)
 ```
 
 ## Workflows
@@ -91,37 +99,37 @@ dx  = models.dx.PrecipitationAFNO.load_model(pkg)
 #| eval: false
 using Dates
 
-backend = io.ZarrBackend("/tmp/forecast.zarr")
+backend = Earth2Studio.io.ZarrBackend("/tmp/forecast.zarr")
 
 # Deterministic
-run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
+Earth2Studio.run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
 
 # Ensemble
-perturb = perturbation.SphericalGaussian()
-run.ensemble([DateTime(2023, 6, 15)], 10, 4, model, ds, backend, perturb; batch_size=4)
+perturb = Earth2Studio.perturbation.SphericalGaussian()
+Earth2Studio.run.ensemble([DateTime(2023, 6, 15)], 10, 4, model, ds, backend, perturb; batch_size=4)
 
 # Diagnostic
-run.diagnostic([DateTime(2023, 6, 15)], 10, model, dx, ds, backend)
+Earth2Studio.run.diagnostic([DateTime(2023, 6, 15)], 10, model, dx, ds, backend)
 ```
 
 ## IO backends
 
 ```{julia}
 #| eval: false
-io.ZarrBackend("/tmp/out.zarr")
-io.NetCDF4Backend("/tmp/out.nc")
-io.AsyncZarrBackend("/tmp/out.zarr")
-io.XarrayBackend()
-io.KVBackend()
+Earth2Studio.io.ZarrBackend("/tmp/out.zarr")
+Earth2Studio.io.NetCDF4Backend("/tmp/out.nc")
+Earth2Studio.io.AsyncZarrBackend("/tmp/out.zarr")
+Earth2Studio.io.XarrayBackend()
+Earth2Studio.io.KVBackend()
 ```
 
 ## Statistics
 
 ```{julia}
 #| eval: false
-m = statistics.rmse(reduction_dimensions=["time"])
-m = statistics.acc(reduction_dimensions=["time"])
-m = statistics.crps(ensemble_dimension="ensemble")
+m = Earth2Studio.statistics.rmse(reduction_dimensions=["time"])
+m = Earth2Studio.statistics.acc(reduction_dimensions=["time"])
+m = Earth2Studio.statistics.crps(ensemble_dimension="ensemble")
 ```
 
 ## Bringing results back to Julia

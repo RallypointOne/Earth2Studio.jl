@@ -4,9 +4,9 @@ title: "Earth2Studio.jl"
 
 ## Overview
 
-**Earth2Studio.jl** is a thin Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI-powered weather and climate forecasting. It uses [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) to expose the full `earth2studio` Python API — data sources, prognostic and diagnostic models, perturbations, IO backends, run workflows, and verification statistics — as native Python objects you can call from Julia.
+**Earth2Studio.jl** is a thin Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI-powered weather and climate forecasting. It uses [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) to expose the full `earth2studio` Python API — data sources, prognostic and diagnostic models, perturbations, IO backends, run workflows, and verification statistics — as Python objects you can call from Julia.
 
-The package itself is intentionally minimal: it imports `earth2studio` and its top-level submodules, and re-exports them as `Py` references. All functionality lives in the upstream Python package.
+The package itself is intentionally minimal: it imports `earth2studio` and its top-level submodules and holds them as `Py` references. Nothing is exported, because upstream names such as `run` and `io` would clash with `Base`. All functionality lives in the upstream Python package.
 
 ## Quickstart
 
@@ -14,29 +14,28 @@ Install Earth2Studio.jl:
 
 ```julia
 using Pkg
-Pkg.add("Earth2Studio")
+Pkg.add(url="https://github.com/RallypointOne/Earth2Studio.jl")
 ```
 
-The Conda environment managed by [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) installs Python, NumPy, and xarray. The `earth2studio` Python package itself must be added to your project (extras pick which models you want):
+On first load, [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) creates a Conda environment with Python (3.11–3.13), `earth2studio[data]` (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a `CondaPkg.toml` to your own project and CondaPkg merges it with the one shipped here:
 
-```julia
-using CondaPkg
-CondaPkg.add_pip("earth2studio")            # base
-CondaPkg.add_pip("earth2studio[fcn,pangu]") # with model extras
+```toml
+[pip.deps.earth2studio]
+extras = ["fcn", "pangu"]
 ```
 
-Then call into the Python API:
+Then call into the Python API through the module:
 
 ```julia
 using Earth2Studio
 using Dates
 
-ds = data.ARCO()
+ds = Earth2Studio.data.ARCO()
 da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])
 
-model   = models.px.FCN.load_model(models.px.FCN.load_default_package())
-backend = io.ZarrBackend("/tmp/forecast.zarr")
-run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
+model   = Earth2Studio.models.px.FCN.load_model(Earth2Studio.models.px.FCN.load_default_package())
+backend = Earth2Studio.io.ZarrBackend("/tmp/forecast.zarr")
+Earth2Studio.run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
 ```
 
-`DateTime`/`Vector{DateTime}` and `String`/`Vector{String}` are auto-converted to the Python types earth2studio expects — no `numpy` wrapping or `pylist(...)` needed. See the [Tutorial](tutorial.qmd) for the full set of interop patterns.
+`DateTime` and `String` convert to the Python types earth2studio expects, and Julia vectors are accepted wherever earth2studio iterates over a list. See the [Tutorial](tutorial.qmd) for the full set of interop patterns.
