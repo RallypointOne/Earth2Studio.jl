@@ -10,32 +10,45 @@ The package itself is intentionally minimal: it imports `earth2studio` and its t
 
 ## Quickstart
 
-Install Earth2Studio.jl:
-
-```julia
-using Pkg
-Pkg.add(url="https://github.com/RallypointOne/Earth2Studio.jl")
-```
-
-On first load, [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) creates a Conda environment with Python (3.11–3.13), `earth2studio[data]` (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a `CondaPkg.toml` to your own project and CondaPkg merges it with the one shipped here:
+On first `using Earth2Studio`, [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) creates a Conda environment with Python (3.11–3.13), `earth2studio[data]` (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a `CondaPkg.toml` to your own project and CondaPkg merges it with the one shipped here:
 
 ```toml
 [pip.deps.earth2studio]
 extras = ["fcn", "pangu"]
 ```
 
-Then call into the Python API through the module:
+Every reference is accessed through the module, e.g. `Earth2Studio.data`. `DateTime` and `String` convert to the Python types earth2studio expects, and Julia vectors are accepted wherever earth2studio iterates over a list. See the [Tutorial](tutorial.qmd) for the full set of interop patterns and for running forecast models.
 
-```julia
-using Earth2Studio
-using Dates
+Fetch a field from ARCO ERA5, bring it back to Julia with [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl), and plot it with [CairoMakie](https://docs.makie.org):
 
-ds = Earth2Studio.data.ARCO()
-da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])
-
-model   = Earth2Studio.models.px.FCN.load_model(Earth2Studio.models.px.FCN.load_default_package())
-backend = Earth2Studio.io.ZarrBackend("/tmp/forecast.zarr")
-Earth2Studio.run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)
+```{julia}
+#| echo: false
+# On first zarr chunk decode, numcodecs creates a multiprocessing.Lock, which spawns a
+# resource_tracker subprocess. That child inherits the stdout/stderr pipe the notebook
+# runner uses to capture cell output and keeps it open, so the render hangs waiting for
+# EOF. Spawn the tracker here with stdio pointed at /dev/null so it never holds the pipe.
+using PythonCall: pyimport
+redirect_stdio(stdout=devnull, stderr=devnull) do
+    pyimport("multiprocessing.resource_tracker").ensure_running()
+end
 ```
 
-`DateTime` and `String` convert to the Python types earth2studio expects, and Julia vectors are accepted wherever earth2studio iterates over a list. See the [Tutorial](tutorial.qmd) for the full set of interop patterns.
+```{julia}
+using Earth2Studio
+using Dates
+using CairoMakie
+using PythonCall: pyconvert
+
+ds = Earth2Studio.data.ARCO(verbose=false)
+da = ds(DateTime(2023, 6, 15), "t2m")   # xarray.DataArray with dims (time, variable, lat, lon)
+
+lon = pyconvert(Vector, da.lon.values)
+lat = pyconvert(Vector, da.lat.values)
+t2m = pyconvert(Array, da.values)[1, 1, :, :] .- 273.15   # lat × lon, °C
+
+fig = Figure(size=(900, 450))
+ax = Axis(fig[1, 1]; title="ERA5 2 m temperature, 2023-06-15 00:00 UTC", xlabel="Longitude", ylabel="Latitude")
+hm = heatmap!(ax, lon, lat, permutedims(t2m))
+Colorbar(fig[1, 2], hm; label="°C")
+fig
+```

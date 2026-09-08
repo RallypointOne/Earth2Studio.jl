@@ -1,27 +1,43 @@
 ---
 title: "Coverage"
+resources:
+  - coverage/
 ---
 
 ```{julia}
 #| echo: false
-#| output: asis
+#| output: false
+# `output: false` matters: Pkg.test and genhtml print ANSI-colored logs, and inserting
+# that text into the page as markdown makes pandoc hang on the unmatched `[` sequences.
 if haskey(ENV, "CI")
     using LocalCoverage
-    try
-        coverage = generate_coverage("Earth2Studio"; run_test=true)
-        html_coverage(coverage; dir=joinpath(@__DIR__, "_site", "coverage"), open=false)
-        cov_dir = joinpath(dirname(dirname(@__DIR__)), "coverage")
-        mv(joinpath(cov_dir, "lcov.info"), joinpath(@__DIR__, "lcov.info"); force=true)
-        rm(cov_dir; recursive=true, force=true)
-    catch e
-        println("::: {.callout-warning}")
-        println("Coverage report unavailable: $(sprint(showerror, e))")
-        println(":::")
+    coverage = generate_coverage("Earth2Studio"; run_test=true)
+    covdir = joinpath(@__DIR__, "coverage")
+    if coverage.lines_tracked == 0
+        # `genhtml` (lcov 2.x) treats an empty tracefile as a fatal error, so emit a
+        # placeholder instead.
+        mkpath(covdir)
+        write(joinpath(covdir, "index.html"),
+            "<!doctype html><html><body style=\"font-family:sans-serif;color:#555\">" *
+            "<p>No coverage data yet &mdash; add code and tests to generate a report.</p>" *
+            "</body></html>")
+    else
+        html_coverage(coverage; dir=covdir, open=false)
     end
-else
+    cov_dir = joinpath(dirname(dirname(@__DIR__)), "coverage")
+    mv(joinpath(cov_dir, "lcov.info"), joinpath(@__DIR__, "lcov.info"); force=true)
+    rm(cov_dir; recursive=true, force=true)
+end
+```
+
+```{julia}
+#| echo: false
+#| output: asis
+if !haskey(ENV, "CI")
     println("::: {.callout-note}")
     println("Coverage report is only generated in CI builds.")
     println(":::")
+    println()
 end
 ```
 
