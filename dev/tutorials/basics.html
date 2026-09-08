@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Tutorial – Earth2Studio.jl</title>
+<title>Basics – Earth2Studio.jl</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -64,25 +64,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./api.html" rel="next">
-<link href="./index.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-02a8592a4cf3893cf56a8581db556df5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../tutorials/forecasting.html" rel="next">
+<link href="../index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-095245003bb80bd2beb305de39928752.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-02a8592a4cf3893cf56a8581db556df5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -109,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="../assets/styles.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light">
@@ -153,7 +153,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Docs</a></li><li class="breadcrumb-item"><a href="./tutorial.html"><span class="chapter-title">Tutorial</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/basics.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/basics.html"><span class="chapter-title">Basics</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -184,12 +184,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Earth2Studio.jl</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./tutorial.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Tutorial</span></a>
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Earth2Studio.jl</span></a>
   </div>
 </li>
       </ul>
@@ -197,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">API</span></a>
+ <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -205,7 +200,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./api.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">API</span></a>
+  <a href="../tutorials/basics.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Forecasting</span></a>
   </div>
 </li>
       </ul>
@@ -213,7 +213,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Resources</span></a>
+ <span class="menu-text">API</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -221,7 +221,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./resources/coverage.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Coverage</span></a>
+  <a href="../api.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">API</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Resources</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/coverage.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Coverage</span></a>
   </div>
 </li>
       </ul>
@@ -252,9 +268,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Docs</a></li><li class="breadcrumb-item"><a href="./tutorial.html"><span class="chapter-title">Tutorial</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/basics.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/basics.html"><span class="chapter-title">Basics</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">Tutorial</span></h1>
+<h1 class="title"><span class="chapter-title">Basics</span></h1>
 </div>
 
 
@@ -326,115 +342,120 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>A <code>juliacall.VectorValue</code> is not a Python <code>list</code>, but it supports <code>len</code>, indexing, and iteration, which is all earth2studio does with these arguments. So you can pass Julia vectors directly:</p>
+<p>A <code>juliacall.VectorValue</code> is not a Python <code>list</code>, but it supports <code>len</code>, indexing, and iteration. Each of those calls back into Julia. That is safe on the main thread, which is where the <code>run</code> workflows convert their <code>time</code> argument, so Julia vectors can be passed to them directly:</p>
 <div id="6" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> Earth2Studio.data.<span class="fu">ARCO</span>()</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), [<span class="st">"t2m"</span>, <span class="st">"u10m"</span>])                <span class="co"># one time</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">16</span>)], <span class="st">"t2m"</span>)  <span class="co"># several</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">deterministic</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">16</span>)], <span class="fl">10</span>, model, ds, backend)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Data sources are different: they iterate <code>time</code> and <code>variable</code> inside an async fetch that runs on fsspec’s background IO thread. A callback into Julia from a thread Julia does not own can deadlock the process (Julia’s garbage collector waits for the main thread to reach a safepoint while the main thread waits for Python’s GIL). Convert with <code>pylist</code> before calling a data source:</p>
+<div id="8" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pylist</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> Earth2Studio.data.<span class="fu">ARCO</span>()</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="fu">pylist</span>([<span class="st">"t2m"</span>, <span class="st">"u10m"</span>]))                <span class="co"># one time</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">pylist</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">16</span>)]), <span class="st">"t2m"</span>)  <span class="co"># several</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Two practical caveats:</p>
 <ul>
 <li><code>Date</code> (no time component) is converted to Python’s <code>datetime.date</code>, which earth2studio mixes with <code>datetime.datetime</code> internally and triggers <code>TypeError</code>. Wrap with <code>DateTime(d)</code> first.</li>
-<li>If a Python API specifically wants a real <code>list</code> or a <code>numpy.datetime64</code> array, build it explicitly with <code>pylist(...)</code> or <code>pyimport("numpy").array(...)</code>.</li>
+<li>If a Python API specifically wants a <code>numpy.datetime64</code> array, build it explicitly with <code>pyimport("numpy").array(...)</code>.</li>
 </ul>
 </section>
 <section id="fetching-data" class="level2">
 <h2 class="anchored" data-anchor-id="fetching-data">Fetching data</h2>
-<div id="8" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pyconvert, PyArray</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> Earth2Studio.data.<span class="fu">ARCO</span>()</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), [<span class="st">"t2m"</span>, <span class="st">"u10m"</span>])</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">pyconvert</span>(<span class="dt">Tuple</span>, da.dims)        <span class="co"># ("time", "variable", "lat", "lon")</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">pyconvert</span>(<span class="dt">Tuple</span>, da.shape)       <span class="co"># (1, 2, 721, 1440)</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> <span class="fu">PyArray</span>(da.values)         <span class="co"># zero-copy PyArray{Float64, 4}</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>t2m <span class="op">=</span> arr[<span class="fl">1</span>, <span class="fl">1</span>, <span class="op">:</span>, <span class="op">:</span>]            <span class="co"># 721 × 1440 lat × lon Kelvin</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="10" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pyconvert, pylist, PyArray</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> Earth2Studio.data.<span class="fu">ARCO</span>()</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="fu">pylist</span>([<span class="st">"t2m"</span>, <span class="st">"u10m"</span>]))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">pyconvert</span>(<span class="dt">Tuple</span>, da.dims)        <span class="co"># ("time", "variable", "lat", "lon")</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">pyconvert</span>(<span class="dt">Tuple</span>, da.shape)       <span class="co"># (1, 2, 721, 1440)</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> <span class="fu">PyArray</span>(da.values)         <span class="co"># zero-copy PyArray{Float64, 4}</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>t2m <span class="op">=</span> arr[<span class="fl">1</span>, <span class="fl">1</span>, <span class="op">:</span>, <span class="op">:</span>]            <span class="co"># 721 × 1440 lat × lon Kelvin</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="variable-names" class="level2">
 <h2 class="anchored" data-anchor-id="variable-names">Variable names</h2>
 <p>earth2studio uses one set of short variable names across all data sources: surface fields such as <code>t2m</code>, <code>u10m</code>, <code>msl</code>, <code>tp</code>, and pressure-level fields written as <code>&lt;variable&gt;&lt;level&gt;</code>, e.g.&nbsp;<code>t850</code>, <code>z500</code>, <code>q700</code>. Each data source has a lexicon class in <code>earth2studio.lexicon</code> whose <code>VOCAB</code> dict maps these names to the source’s native names, so its keys are the variables that source can provide. See the upstream <a href="https://nvidia.github.io/earth2studio/main/userguide/advanced/lexicon/">lexicon guide</a> for the full naming convention.</p>
-<div id="10" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pyconvert, pycontains</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>lex <span class="op">=</span> Earth2Studio.earth2studio.lexicon</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>vocab <span class="op">=</span> lex.ARCOLexicon.VOCAB</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(vocab)                                    <span class="co"># 1436</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">pyconvert</span>(<span class="dt">Vector</span>{<span class="dt">String</span>}, vocab.<span class="fu">keys</span>())[<span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]     <span class="co"># ["u10m", "v10m", "u100m", "v100m", "t2m"]</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">pycontains</span>(vocab, <span class="st">"t850"</span>)                        <span class="co"># true</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>vocab[<span class="st">"z500"</span>]                                    <span class="co"># "geopotential::500"</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>lex.GFSLexicon.VOCAB[<span class="st">"z500"</span>]                     <span class="co"># "HGT::500 mb"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="12" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pyconvert, pycontains</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>lex <span class="op">=</span> Earth2Studio.earth2studio.lexicon</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>vocab <span class="op">=</span> lex.ARCOLexicon.VOCAB</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(vocab)                                    <span class="co"># 1436</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">pyconvert</span>(<span class="dt">Vector</span>{<span class="dt">String</span>}, vocab.<span class="fu">keys</span>())[<span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]     <span class="co"># ["u10m", "v10m", "u100m", "v100m", "t2m"]</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">pycontains</span>(vocab, <span class="st">"t850"</span>)                        <span class="co"># true</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>vocab[<span class="st">"z500"</span>]                                    <span class="co"># "geopotential::500"</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>lex.GFSLexicon.VOCAB[<span class="st">"z500"</span>]                     <span class="co"># "HGT::500 mb"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="prognostic-models" class="level2">
 <h2 class="anchored" data-anchor-id="prognostic-models">Prognostic models</h2>
-<div id="12" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pkg   <span class="op">=</span> Earth2Studio.models.px.FCN.<span class="fu">load_default_package</span>()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Earth2Studio.models.px.FCN.<span class="fu">load_model</span>(pkg)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>model.<span class="fu">to</span>(<span class="st">"cuda"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="14" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pkg   <span class="op">=</span> Earth2Studio.models.px.FCN.<span class="fu">load_default_package</span>()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Earth2Studio.models.px.FCN.<span class="fu">load_model</span>(pkg)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>model.<span class="fu">to</span>(<span class="st">"cuda"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="diagnostic-models" class="level2">
 <h2 class="anchored" data-anchor-id="diagnostic-models">Diagnostic models</h2>
-<div id="14" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pkg <span class="op">=</span> Earth2Studio.models.dx.PrecipitationAFNO.<span class="fu">load_default_package</span>()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dx  <span class="op">=</span> Earth2Studio.models.dx.PrecipitationAFNO.<span class="fu">load_model</span>(pkg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="16" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pkg <span class="op">=</span> Earth2Studio.models.dx.PrecipitationAFNO.<span class="fu">load_default_package</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dx  <span class="op">=</span> Earth2Studio.models.dx.PrecipitationAFNO.<span class="fu">load_model</span>(pkg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="workflows" class="level2">
 <h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
-<div id="16" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>backend <span class="op">=</span> Earth2Studio.io.<span class="fu">ZarrBackend</span>(<span class="st">"/tmp/forecast.zarr"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Deterministic</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">deterministic</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>)], <span class="fl">10</span>, model, ds, backend)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensemble</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>perturb <span class="op">=</span> Earth2Studio.perturbation.<span class="fu">SphericalGaussian</span>()</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">ensemble</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>)], <span class="fl">10</span>, <span class="fl">4</span>, model, ds, backend, perturb; batch_size<span class="op">=</span><span class="fl">4</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Diagnostic</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">diagnostic</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>)], <span class="fl">10</span>, model, dx, ds, backend)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="18" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>backend <span class="op">=</span> Earth2Studio.io.<span class="fu">ZarrBackend</span>(<span class="st">"/tmp/forecast.zarr"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Deterministic</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">deterministic</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>)], <span class="fl">10</span>, model, ds, backend)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensemble</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>perturb <span class="op">=</span> Earth2Studio.perturbation.<span class="fu">SphericalGaussian</span>()</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">ensemble</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>)], <span class="fl">10</span>, <span class="fl">4</span>, model, ds, backend, perturb; batch_size<span class="op">=</span><span class="fl">4</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Diagnostic</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>Earth2Studio.run.<span class="fu">diagnostic</span>([<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>)], <span class="fl">10</span>, model, dx, ds, backend)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="io-backends" class="level2">
 <h2 class="anchored" data-anchor-id="io-backends">IO backends</h2>
-<div id="18" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">ZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">NetCDF4Backend</span>(<span class="st">"/tmp/out.nc"</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">AsyncZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">XarrayBackend</span>()</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">KVBackend</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="20" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">ZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">NetCDF4Backend</span>(<span class="st">"/tmp/out.nc"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">AsyncZarrBackend</span>(<span class="st">"/tmp/out.zarr"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">XarrayBackend</span>()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Earth2Studio.io.<span class="fu">KVBackend</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="statistics" class="level2">
 <h2 class="anchored" data-anchor-id="statistics">Statistics</h2>
-<div id="20" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Earth2Studio.statistics.<span class="fu">rmse</span>(reduction_dimensions<span class="op">=</span>[<span class="st">"time"</span>])</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Earth2Studio.statistics.<span class="fu">acc</span>(reduction_dimensions<span class="op">=</span>[<span class="st">"time"</span>])</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Earth2Studio.statistics.<span class="fu">crps</span>(ensemble_dimension<span class="op">=</span><span class="st">"ensemble"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="22" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Earth2Studio.statistics.<span class="fu">rmse</span>(reduction_dimensions<span class="op">=</span>[<span class="st">"time"</span>])</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Earth2Studio.statistics.<span class="fu">acc</span>(reduction_dimensions<span class="op">=</span>[<span class="st">"time"</span>])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Earth2Studio.statistics.<span class="fu">crps</span>(ensemble_dimension<span class="op">=</span><span class="st">"ensemble"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="bringing-results-back-to-julia" class="level2">
 <h2 class="anchored" data-anchor-id="bringing-results-back-to-julia">Bringing results back to Julia</h2>
-<div id="22" class="cell" data-execution_count="0">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># numpy / xarray array → Julia</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>a_jl   <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Array</span>, da.values)   <span class="co"># copies</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>a_view <span class="op">=</span> <span class="fu">PyArray</span>(da.values)            <span class="co"># zero-copy view</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="24" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># numpy / xarray array → Julia</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>a_jl   <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Array</span>, da.values)   <span class="co"># copies</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>a_view <span class="op">=</span> <span class="fu">PyArray</span>(da.values)            <span class="co"># zero-copy view</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Refer to the <a href="https://juliapy.github.io/PythonCall.jl/stable/">PythonCall.jl docs</a> for more conversion utilities, and to the <a href="https://nvidia.github.io/earth2studio/">earth2studio docs</a> for the Python API itself.</p>
 
@@ -844,13 +865,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="Earth2Studio.jl">
+      <a href="../index.html" class="pagination-link" aria-label="Earth2Studio.jl">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Earth2Studio.jl</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./api.html" class="pagination-link" aria-label="API">
-        <span class="nav-page-text"><span class="chapter-title">API</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/forecasting.html" class="pagination-link" aria-label="Forecasting">
+        <span class="nav-page-text"><span class="chapter-title">Forecasting</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

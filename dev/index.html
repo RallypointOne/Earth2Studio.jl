@@ -71,7 +71,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./tutorial.html" rel="next">
+<link href="./tutorials/basics.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -189,22 +189,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <a href="./index.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Earth2Studio.jl</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorial.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial</span></a>
+  <a href="./tutorials/basics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Forecasting</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
  <span class="menu-text">API</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./api.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">API</span></a>
@@ -214,13 +230,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Resources</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./resources/coverage.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Coverage</span></a>
@@ -275,97 +291,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>On first <code>using Earth2Studio</code>, <a href="https://github.com/JuliaPy/CondaPkg.jl">CondaPkg.jl</a> creates a Conda environment with Python (3.11–3.13), <code>earth2studio[data]</code> (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a <code>CondaPkg.toml</code> to your own project and CondaPkg merges it with the one shipped here:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[pip.deps.earth2studio]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">extras</span> <span class="op">=</span> <span class="op">[</span><span class="st">"fcn"</span><span class="op">,</span> <span class="st">"pangu"</span><span class="op">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Every reference is accessed through the module, e.g.&nbsp;<code>Earth2Studio.data</code>. <code>DateTime</code> and <code>String</code> convert to the Python types earth2studio expects, and Julia vectors are accepted wherever earth2studio iterates over a list. See the <a href="./tutorial.html">Tutorial</a> for the full set of interop patterns and for running forecast models.</p>
+<p>Every reference is accessed through the module, e.g.&nbsp;<code>Earth2Studio.data</code>. <code>DateTime</code> and <code>String</code> convert to the Python types earth2studio expects. See the <a href="./tutorials/basics.html">Basics</a> tutorial for the full set of interop patterns, including when a Julia vector must be converted with <code>pylist</code>, and the <a href="./tutorials/forecasting.html">Forecasting</a> tutorial for running a model.</p>
 <p>Fetch a field from ARCO ERA5, bring it back to Julia with <a href="https://github.com/JuliaPy/PythonCall.jl">PythonCall.jl</a>, and plot it with <a href="https://docs.makie.org">CairoMakie</a>:</p>
-<div id="2" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-stdout">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg ansi-bold">    CondaPkg </span>Found dev dependencies: /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/CondaPkg.toml
-<span class="ansi-green-fg ansi-bold">    CondaPkg </span>Found dependencies: /home/runner/.julia/packages/CondaPkg/lKlVY/CondaPkg.toml
-<span class="ansi-green-fg ansi-bold">    CondaPkg </span>Found dependencies: /home/runner/.julia/packages/PythonCall/5WGSP/CondaPkg.toml
-<span class="ansi-green-fg ansi-bold">    CondaPkg </span>Resolving changes
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ earth2studio (pip)</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ eccodes</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ libstdcxx</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ libstdcxx-ng</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ numpy</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ openssl</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ pygrib</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ python</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ rasterio</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ uv</span>
-<span class="ansi-green-fg ansi-bold">             </span><span class="ansi-green-fg">+ xarray</span>
-<span class="ansi-green-fg ansi-bold">    CondaPkg </span>Initialising pixi
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">/home/runner/.julia/artifacts/8429d049f6c01106c62971e9540e146dc068df25/bin/pixi</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">init</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">--format pixi</span>
-<span class="ansi-green-fg ansi-bold">             </span>└ <span class="ansi-bright-black-fg">/home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg</span>
-✔ Created /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg/pixi.toml
-<span class="ansi-green-fg ansi-bold">    CondaPkg </span>Wrote /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg/pixi.toml
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">[dependencies]</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">openssl = "&gt;=3, &lt;3.6"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">libstdcxx = "&gt;=3.4,&lt;15.0"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">uv = "&gt;=0.4"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">libstdcxx-ng = "&gt;=3.4,&lt;15.0"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">xarray = "*"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">numpy = "*"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">pygrib = "*"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">eccodes = "*"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">rasterio = "*"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ 
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">    [dependencies.python]</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">    channel = "conda-forge"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">    build = "*cp*"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">    version = "&gt;=3.10,!=3.14.0,!=3.14.1,&lt;4, &gt;=3.11,&lt;3.14"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ 
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">[workspace]</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">name = ".CondaPkg"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">platforms = ["linux-64"]</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">channels = ["conda-forge"]</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">channel-priority = "strict"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">description = "automatically generated by CondaPkg.jl"</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ 
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">[pypi-dependencies.earth2studio]</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">extras = ["data"]</span>
-<span class="ansi-green-fg ansi-bold">             </span>└ <span class="ansi-bright-black-fg">version = "&gt;=0.18"</span>
-<span class="ansi-green-fg ansi-bold">    CondaPkg </span>Installing packages
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">/home/runner/.julia/artifacts/8429d049f6c01106c62971e9540e146dc068df25/bin/pixi</span>
-<span class="ansi-green-fg ansi-bold">             </span>│ <span class="ansi-bright-black-fg">install</span>
-<span class="ansi-green-fg ansi-bold">             </span>└ <span class="ansi-bright-black-fg">--manifest-path /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg/pixi.toml</span>
- WARN The package `xarray==2026.7.0` does not have an extra named `parallel`
-✔ The default environment has been installed.
-</pre>
-</div>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>Python: None</code></pre>
-</div>
-</div>
 <div id="4" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pyconvert</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> Earth2Studio.data.<span class="fu">ARCO</span>(verbose<span class="op">=</span><span class="cn">false</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="st">"t2m"</span>)   <span class="co"># xarray.DataArray with dims (time, variable, lat, lon)</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>lon <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Vector</span>, da.lon.values)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>lat <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Vector</span>, da.lat.values)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>t2m <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Array</span>, da.values)[<span class="fl">1</span>, <span class="fl">1</span>, <span class="op">:</span>, <span class="op">:</span>] <span class="op">.-</span> <span class="fl">273.15</span>   <span class="co"># lat × lon, °C</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> <span class="fu">Figure</span>(size<span class="op">=</span>(<span class="fl">900</span>, <span class="fl">450</span>))</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>]; title<span class="op">=</span><span class="st">"ERA5 2 m temperature, 2023-06-15 00:00 UTC"</span>, xlabel<span class="op">=</span><span class="st">"Longitude"</span>, ylabel<span class="op">=</span><span class="st">"Latitude"</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>hm <span class="op">=</span> <span class="fu">heatmap!</span>(ax, lon, lat, <span class="fu">permutedims</span>(t2m))</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">Colorbar</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], hm; label<span class="op">=</span><span class="st">"°C"</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>fig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Earth2Studio</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PythonCall</span>: pyconvert</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> Earth2Studio.data.<span class="fu">ARCO</span>(verbose<span class="op">=</span><span class="cn">false</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>da <span class="op">=</span> <span class="fu">ds</span>(<span class="fu">DateTime</span>(<span class="fl">2023</span>, <span class="fl">6</span>, <span class="fl">15</span>), <span class="st">"t2m"</span>)   <span class="co"># xarray.DataArray with dims (time, variable, lat, lon)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>lon <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Vector</span>, da.lon.values)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>lat <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Vector</span>, da.lat.values)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>t2m <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Array</span>, da.values)[<span class="fl">1</span>, <span class="fl">1</span>, <span class="op">:</span>, <span class="op">:</span>] <span class="op">.-</span> <span class="fl">273.15</span>   <span class="co"># lat × lon, °C</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> <span class="fu">Figure</span>(size<span class="op">=</span>(<span class="fl">900</span>, <span class="fl">450</span>))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>]; title<span class="op">=</span><span class="st">"ERA5 2 m temperature, 2023-06-15 00:00 UTC"</span>, xlabel<span class="op">=</span><span class="st">"Longitude"</span>, ylabel<span class="op">=</span><span class="st">"Latitude"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>hm <span class="op">=</span> <span class="fu">heatmap!</span>(ax, lon, lat, <span class="fu">permutedims</span>(t2m))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">Colorbar</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], hm; label<span class="op">=</span><span class="st">"°C"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>fig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
 <pre><span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
-   7758.1 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
-  1 dependency successfully precompiled in 8 seconds
+   6750.2 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
+  1 dependency successfully precompiled in 7 seconds
 <span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
-   5905.1 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerCairoMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
+   5395.0 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerCairoMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
   1 dependency successfully precompiled in 6 seconds
 </pre>
 </div>
@@ -783,8 +735,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./tutorial.html" class="pagination-link" aria-label="Tutorial">
-        <span class="nav-page-text"><span class="chapter-title">Tutorial</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./tutorials/basics.html" class="pagination-link" aria-label="Basics">
+        <span class="nav-page-text"><span class="chapter-title">Basics</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
