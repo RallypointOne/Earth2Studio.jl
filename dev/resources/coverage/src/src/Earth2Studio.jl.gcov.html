@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - on branch main - src/src/Earth2Studio.jl</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/src</a> - Earth2Studio.jl<span style="font-size: 80%;"> (source / <a href="Earth2Studio.jl.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">on branch main</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">93.3&nbsp;%</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">14</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-09-08 14:17:59</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : module Earth2Studio</span>
+<span id="L2"><span class="lineNum">       2</span>              : </span>
+<span id="L3"><span class="lineNum">       3</span>              : using PythonCall: PythonCall, Py, pyimport, pyconvert, pynew, pycopy!, pycontains</span>
+<span id="L4"><span class="lineNum">       4</span>              : </span>
+<span id="L5"><span class="lineNum">       5</span>              : #-------------------------------------------------------------------------------# Python module references</span>
+<span id="L6"><span class="lineNum">       6</span>              : &quot;&quot;&quot;</span>
+<span id="L7"><span class="lineNum">       7</span>              :     Earth2Studio.earth2studio :: Py</span>
+<span id="L8"><span class="lineNum">       8</span>              : </span>
+<span id="L9"><span class="lineNum">       9</span>              : Top-level [`earth2studio`](https://github.com/NVIDIA/earth2studio) Python module.</span>
+<span id="L10"><span class="lineNum">      10</span>              : &quot;&quot;&quot;</span>
+<span id="L11"><span class="lineNum">      11</span>              : const earth2studio = pynew()</span>
+<span id="L12"><span class="lineNum">      12</span>              : </span>
+<span id="L13"><span class="lineNum">      13</span>              : # Top-level submodules of `earth2studio` exposed as `Earth2Studio.&lt;name&gt;`</span>
+<span id="L14"><span class="lineNum">      14</span>              : const SUBMODULES = (</span>
+<span id="L15"><span class="lineNum">      15</span>              :     :data         =&gt; &quot;data sources (e.g. `data.ARCO`, `data.GFS`, `data.WB2ERA5`)&quot;,</span>
+<span id="L16"><span class="lineNum">      16</span>              :     :models       =&gt; &quot;prognostic (`models.px`) and diagnostic (`models.dx`) model classes&quot;,</span>
+<span id="L17"><span class="lineNum">      17</span>              :     :perturbation =&gt; &quot;ensemble perturbation methods (e.g. `perturbation.Gaussian`, `perturbation.BredVector`)&quot;,</span>
+<span id="L18"><span class="lineNum">      18</span>              :     :io           =&gt; &quot;output backends (e.g. `io.ZarrBackend`, `io.NetCDF4Backend`)&quot;,</span>
+<span id="L19"><span class="lineNum">      19</span>              :     :run          =&gt; &quot;inference workflows (`run.deterministic`, `run.ensemble`, `run.diagnostic`)&quot;,</span>
+<span id="L20"><span class="lineNum">      20</span>              :     :statistics   =&gt; &quot;verification metrics (e.g. `statistics.rmse`, `statistics.acc`, `statistics.crps`)&quot;,</span>
+<span id="L21"><span class="lineNum">      21</span>              :     :utils        =&gt; &quot;miscellaneous utilities from the upstream package&quot;,</span>
+<span id="L22"><span class="lineNum">      22</span>              : )</span>
+<span id="L23"><span class="lineNum">      23</span>              : </span>
+<span id="L24"><span class="lineNum">      24</span>              : for (name, desc) in SUBMODULES</span>
+<span id="L25"><span class="lineNum">      25</span>              :     @eval @doc $(&quot;    Earth2Studio.$name :: Py\n\n`earth2studio.$name` — $desc.&quot;) const $name = pynew()</span>
+<span id="L26"><span class="lineNum">      26</span>              : end</span>
+<span id="L27"><span class="lineNum">      27</span>              : </span>
+<span id="L28"><span class="lineNum">      28</span> <span class="tlaGNC tlaBgGNC">           1 : function __init__()</span></span>
+<span id="L29"><span class="lineNum">      29</span> <span class="tlaGNC">           1 :     _ensure_ssl_cert_file()</span></span>
+<span id="L30"><span class="lineNum">      30</span> <span class="tlaGNC">           1 :     pycopy!(earth2studio, pyimport(&quot;earth2studio&quot;))</span></span>
+<span id="L31"><span class="lineNum">      31</span> <span class="tlaGNC">           1 :     for (name, _) in SUBMODULES</span></span>
+<span id="L32"><span class="lineNum">      32</span> <span class="tlaGNC">           7 :         pycopy!(getfield(@__MODULE__, name), pyimport(&quot;earth2studio.$name&quot;))</span></span>
+<span id="L33"><span class="lineNum">      33</span> <span class="tlaGNC">           8 :     end</span></span>
+<span id="L34"><span class="lineNum">      34</span> <span class="tlaGNC">           1 :     return nothing</span></span>
+<span id="L35"><span class="lineNum">      35</span>              : end</span>
+<span id="L36"><span class="lineNum">      36</span>              : </span>
+<span id="L37"><span class="lineNum">      37</span>              : #----------------------------------------------------------------------------# ensure_ssl_cert_file</span>
+<span id="L38"><span class="lineNum">      38</span>              : # Make HTTPS work for Python inside the CondaPkg environment on macOS.</span>
+<span id="L39"><span class="lineNum">      39</span>              : #</span>
+<span id="L40"><span class="lineNum">      40</span>              : # Problem: The OpenSSL bundled with Conda Python on macOS looks for its trusted root certificates</span>
+<span id="L41"><span class="lineNum">      41</span>              : # (the CA bundle) at a path fixed at build time. That path does not exist when the environment is</span>
+<span id="L42"><span class="lineNum">      42</span>              : # installed under .CondaPkg/, so every TLS connection fails with a certificate verification error.</span>
+<span id="L43"><span class="lineNum">      43</span>              : # This breaks remote data sources (ARCO, WB2ERA5, CDS, ...).</span>
+<span id="L44"><span class="lineNum">      44</span>              : #</span>
+<span id="L45"><span class="lineNum">      45</span>              : # Details:</span>
+<span id="L46"><span class="lineNum">      46</span>              : # - Set it in Python's os.environ, not Julia's ENV. os.environ also calls</span>
+<span id="L47"><span class="lineNum">      47</span>              : #   putenv, so OpenSSL sees it, while Julia's own HTTPS clients are unaffected.</span>
+<span id="L48"><span class="lineNum">      48</span>              : # - Must run before importing earth2studio; some libraries in its data-source</span>
+<span id="L49"><span class="lineNum">      49</span>              : #   stack read SSL settings at import time and cache them.</span>
+<span id="L50"><span class="lineNum">      50</span> <span class="tlaGNC">           1 : function _ensure_ssl_cert_file()</span></span>
+<span id="L51"><span class="lineNum">      51</span> <span class="tlaGNC">           1 :     environ = pyimport(&quot;os&quot;).environ</span></span>
+<span id="L52"><span class="lineNum">      52</span> <span class="tlaGNC">           1 :     pycontains(environ, &quot;SSL_CERT_FILE&quot;) &amp;&amp; return  # If user already set, ignore</span></span>
+<span id="L53"><span class="lineNum">      53</span> <span class="tlaGNC">           1 :     cert = try</span></span>
+<span id="L54"><span class="lineNum">      54</span> <span class="tlaGNC">           2 :         pyconvert(String, pyimport(&quot;certifi&quot;).where())  # Use certifi's SSL_CERT_FILE</span></span>
+<span id="L55"><span class="lineNum">      55</span>              :     catch</span>
+<span id="L56"><span class="lineNum">      56</span> <span class="tlaUNC tlaBgUNC">           0 :         return</span></span>
+<span id="L57"><span class="lineNum">      57</span>              :     end</span>
+<span id="L58"><span class="lineNum">      58</span> <span class="tlaGNC tlaBgGNC">           1 :     environ[&quot;SSL_CERT_FILE&quot;] = cert</span></span>
+<span id="L59"><span class="lineNum">      59</span> <span class="tlaGNC">           1 :     return</span></span>
+<span id="L60"><span class="lineNum">      60</span>              : end</span>
+<span id="L61"><span class="lineNum">      61</span>              : </span>
+<span id="L62"><span class="lineNum">      62</span>              : end # module</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

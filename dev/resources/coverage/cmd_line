@@ -1,0 +1,1 @@
+genhtml -t 'on branch main' -o /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/resources/coverage coverage/lcov.info

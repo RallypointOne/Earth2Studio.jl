@@ -4,18 +4,7 @@
     "href": "index.html",
     "title": "Earth2Studio.jl",
     "section": "",
-    "text": "Overview\nWelcome to the documentation for Earth2Studio.jl.\nEarth2Studio.jl is a Julia wrapper around NVIDIA’s earth2studio Python package for AI-powered weather and climate forecasting. It provides:\nThe package uses PythonCall.jl and CondaPkg.jl to manage the Python environment automatically.",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Earth2Studio.jl</span>"
-    ]
-  },
-  {
-    "objectID": "index.html#overview",
-    "href": "index.html#overview",
-    "title": "Earth2Studio.jl",
-    "section": "",
-    "text": "Data Sources: Access ERA5 reanalysis, GFS forecasts, HRRR, and more via a unified interface.\nPrognostic Models: Run state-of-the-art AI weather models including FourCastNet, Pangu-Weather, GraphCast, Aurora, and AIFS.\nDiagnostic Models: Apply downscaling (CorrDiff), precipitation estimation, tropical cyclone tracking, and derived quantities.\nEnsemble Forecasting: Generate perturbed ensemble members with Gaussian, bred vector, and lagged ensemble methods.\nVerification Metrics: Compute RMSE, ACC, CRPS, Brier scores, and more.",
+    "text": "Overview\nEarth2Studio.jl is a thin Julia wrapper around NVIDIA’s earth2studio Python package for AI-powered weather and climate forecasting. It uses PythonCall.jl to expose the full earth2studio Python API — data sources, prognostic and diagnostic models, perturbations, IO backends, run workflows, and verification statistics — as Python objects you can call from Julia.\nThe package itself is intentionally minimal: it imports earth2studio and its top-level submodules and holds them as Py references. Nothing is exported, because upstream names such as run and io would clash with Base. All functionality lives in the upstream Python package.",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Earth2Studio.jl</span>"
@@ -26,7 +15,7 @@
     "href": "index.html#quickstart",
     "title": "Earth2Studio.jl",
     "section": "Quickstart",
-    "text": "Quickstart\nusing Pkg\nPkg.add(url=\"https://github.com/RallypointOne/Earth2Studio.jl\")\nThe base package installs lightweight Python dependencies (numpy, xarray). To use AI models, add earth2studio with the desired extras to your project’s CondaPkg.toml:\n[pip.deps]\n\"earth2studio[pangu]\" = \"\"\nThen run a deterministic forecast:\nusing Earth2Studio\nusing Dates\n\n# Load data and model\ndata = GFS()\nmodel = Pangu24()\nio = ZarrBackend(\"/tmp/forecast.zarr\")\n\n# Run a 10-step forecast from a specific date\nresult = run_deterministic(DateTime(2024, 1, 15), 10, model, data, io)\n\n# Convert results to Julia arrays\nds = to_xarray(result)",
+    "text": "Quickstart\nOn first using Earth2Studio, CondaPkg.jl creates a Conda environment with Python (3.11–3.13), earth2studio[data] (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a CondaPkg.toml to your own project and CondaPkg merges it with the one shipped here:\n[pip.deps.earth2studio]\nextras = [\"fcn\", \"pangu\"]\nEvery reference is accessed through the module, e.g. Earth2Studio.data. DateTime and String convert to the Python types earth2studio expects, and Julia vectors are accepted wherever earth2studio iterates over a list. See the Tutorial for the full set of interop patterns and for running forecast models.\nFetch a field from ARCO ERA5, bring it back to Julia with PythonCall.jl, and plot it with CairoMakie:\n\n\n\n    CondaPkg Found dev dependencies: /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/CondaPkg.toml\n    CondaPkg Found dependencies: /home/runner/.julia/packages/CondaPkg/lKlVY/CondaPkg.toml\n    CondaPkg Found dependencies: /home/runner/.julia/packages/PythonCall/5WGSP/CondaPkg.toml\n    CondaPkg Resolving changes\n             + earth2studio (pip)\n             + eccodes\n             + libstdcxx\n             + libstdcxx-ng\n             + numpy\n             + openssl\n             + pygrib\n             + python\n             + rasterio\n             + uv\n             + xarray\n    CondaPkg Initialising pixi\n             │ /home/runner/.julia/artifacts/8429d049f6c01106c62971e9540e146dc068df25/bin/pixi\n             │ init\n             │ --format pixi\n             └ /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg\n✔ Created /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg/pixi.toml\n    CondaPkg Wrote /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg/pixi.toml\n             │ [dependencies]\n             │ openssl = \"&gt;=3, &lt;3.6\"\n             │ libstdcxx = \"&gt;=3.4,&lt;15.0\"\n             │ uv = \"&gt;=0.4\"\n             │ libstdcxx-ng = \"&gt;=3.4,&lt;15.0\"\n             │ xarray = \"*\"\n             │ numpy = \"*\"\n             │ pygrib = \"*\"\n             │ eccodes = \"*\"\n             │ rasterio = \"*\"\n             │ \n             │     [dependencies.python]\n             │     channel = \"conda-forge\"\n             │     build = \"*cp*\"\n             │     version = \"&gt;=3.10,!=3.14.0,!=3.14.1,&lt;4, &gt;=3.11,&lt;3.14\"\n             │ \n             │ [workspace]\n             │ name = \".CondaPkg\"\n             │ platforms = [\"linux-64\"]\n             │ channels = [\"conda-forge\"]\n             │ channel-priority = \"strict\"\n             │ description = \"automatically generated by CondaPkg.jl\"\n             │ \n             │ [pypi-dependencies.earth2studio]\n             │ extras = [\"data\"]\n             └ version = \"&gt;=0.18\"\n    CondaPkg Installing packages\n             │ /home/runner/.julia/artifacts/8429d049f6c01106c62971e9540e146dc068df25/bin/pixi\n             │ install\n             └ --manifest-path /home/runner/work/Earth2Studio.jl/Earth2Studio.jl/docs/.CondaPkg/pixi.toml\n WARN The package `xarray==2026.7.0` does not have an extra named `parallel`\n✔ The default environment has been installed.\n\n\n\n\nPython: None\n\n\n\nusing Earth2Studio\nusing Dates\nusing CairoMakie\nusing PythonCall: pyconvert\n\nds = Earth2Studio.data.ARCO(verbose=false)\nda = ds(DateTime(2023, 6, 15), \"t2m\")   # xarray.DataArray with dims (time, variable, lat, lon)\n\nlon = pyconvert(Vector, da.lon.values)\nlat = pyconvert(Vector, da.lat.values)\nt2m = pyconvert(Array, da.values)[1, 1, :, :] .- 273.15   # lat × lon, °C\n\nfig = Figure(size=(900, 450))\nax = Axis(fig[1, 1]; title=\"ERA5 2 m temperature, 2023-06-15 00:00 UTC\", xlabel=\"Longitude\", ylabel=\"Latitude\")\nhm = heatmap!(ax, lon, lat, permutedims(t2m))\nColorbar(fig[1, 2], hm; label=\"°C\")\nfig\n\n\nPrecompiling packages...\n   7983.3 ms  ✓ QuartoNotebookWorkerMakieExt (serial)\n  1 dependency successfully precompiled in 8 seconds\nPrecompiling packages...\n   6103.3 ms  ✓ QuartoNotebookWorkerCairoMakieExt (serial)\n  1 dependency successfully precompiled in 6 seconds",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Earth2Studio.jl</span>"
@@ -37,263 +26,98 @@
     "href": "tutorial.html",
     "title": "Tutorial",
     "section": "",
-    "text": "Setup\nThis tutorial walks through a complete weather forecasting workflow with Earth2Studio.jl: fetching initial conditions, running a forecast, and visualizing results.\nusing Earth2Studio\nusing Dates",
+    "text": "Module references\nEarth2Studio.jl holds the earth2studio Python module and its submodules as Py objects. Anything you can do in Python you can do in Julia by calling into these objects via PythonCall.jl.\nNothing is exported (upstream names such as run and io would clash with Base), so every reference is accessed through the module:\nusing Earth2Studio\n\nEarth2Studio.earth2studio  # earth2studio\nEarth2Studio.data          # earth2studio.data\nEarth2Studio.models        # earth2studio.models  (use models.px and models.dx)\nEarth2Studio.perturbation  # earth2studio.perturbation\nEarth2Studio.io            # earth2studio.io\nEarth2Studio.run           # earth2studio.run\nEarth2Studio.statistics    # earth2studio.statistics\nEarth2Studio.utils         # earth2studio.utils\nEach is a PythonCall.Py reference — attribute access, calls, and conversions work the way they do in PythonCall. For shorter code, alias the module:\nimport Earth2Studio as E2S\nE2S.data.ARCO()",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "tutorial.html#step-1-fetch-initial-conditions",
-    "href": "tutorial.html#step-1-fetch-initial-conditions",
+    "objectID": "tutorial.html#auto-conversion-of-common-julia-types",
+    "href": "tutorial.html#auto-conversion-of-common-julia-types",
     "title": "Tutorial",
-    "section": "Step 1: Fetch Initial Conditions",
-    "text": "Step 1: Fetch Initial Conditions\nChoose a data source and fetch fields for a given time and set of variables:\n\nds = WB2ERA5()\nresult = fetch_data(ds, DateTime(2024, 6, 15), [\"t2m\", \"u10m\", \"v10m\"])\n\nresult.data    # Array{Float32, 4} with dims (time, variable, lat, lon)\nresult.dims    # (:time, :variable, :lat, :lon)\nresult.coords  # NamedTuple with lat/lon vectors, etc.",
+    "section": "Auto-conversion of common Julia types",
+    "text": "Auto-conversion of common Julia types\nPythonCall handles the conversions you most often need at call sites:\n\n\n\n\n\n\n\nJulia\nPython\n\n\n\n\nDateTime\ndatetime.datetime\n\n\nVector{DateTime}\njuliacall.VectorValue yielding datetime.datetime\n\n\nString\nstr\n\n\nVector{String}\njuliacall.VectorValue yielding str\n\n\n\nA juliacall.VectorValue is not a Python list, but it supports len, indexing, and iteration, which is all earth2studio does with these arguments. So you can pass Julia vectors directly:\n\nusing Earth2Studio\nusing Dates\n\nds = Earth2Studio.data.ARCO()\nda = ds(DateTime(2023, 6, 15), [\"t2m\", \"u10m\"])                # one time\nda = ds([DateTime(2023, 6, 15), DateTime(2023, 6, 16)], \"t2m\")  # several\n\nTwo practical caveats:\n\nDate (no time component) is converted to Python’s datetime.date, which earth2studio mixes with datetime.datetime internally and triggers TypeError. Wrap with DateTime(d) first.\nIf a Python API specifically wants a real list or a numpy.datetime64 array, build it explicitly with pylist(...) or pyimport(\"numpy\").array(...).",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "tutorial.html#step-2-run-a-deterministic-forecast",
-    "href": "tutorial.html#step-2-run-a-deterministic-forecast",
+    "objectID": "tutorial.html#fetching-data",
+    "href": "tutorial.html#fetching-data",
     "title": "Tutorial",
-    "section": "Step 2: Run a Deterministic Forecast",
-    "text": "Step 2: Run a Deterministic Forecast\nLoad a prognostic model and run a 10-step forecast:\n\nmodel = Pangu24()\nto_device!(model, \"cuda\")\n\nio = ZarrBackend(\"/tmp/forecast.zarr\")\n\nresult = run_deterministic(DateTime(2024, 6, 15), 10, model, ds, io)\nds_out = to_xarray(result)",
+    "section": "Fetching data",
+    "text": "Fetching data\n\nusing Earth2Studio\nusing PythonCall: pyconvert, PyArray\nusing Dates\n\nds = Earth2Studio.data.ARCO()\nda = ds(DateTime(2023, 6, 15), [\"t2m\", \"u10m\"])\n\npyconvert(Tuple, da.dims)        # (\"time\", \"variable\", \"lat\", \"lon\")\npyconvert(Tuple, da.shape)       # (1, 2, 721, 1440)\n\narr = PyArray(da.values)         # zero-copy PyArray{Float64, 4}\nt2m = arr[1, 1, :, :]            # 721 × 1440 lat × lon Kelvin",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "tutorial.html#step-3-visualize-the-forecast",
-    "href": "tutorial.html#step-3-visualize-the-forecast",
+    "objectID": "tutorial.html#prognostic-models",
+    "href": "tutorial.html#prognostic-models",
     "title": "Tutorial",
-    "section": "Step 3: Visualize the Forecast",
-    "text": "Step 3: Visualize the Forecast\n\nGlobal Temperature Field\nA snapshot of 2-meter temperature at a single forecast lead time. Earth2Studio returns data on a regular latitude-longitude grid.\n\nlat = collect(range(90, -90, length=181))\nlon = collect(range(0, 359, length=360))\n\n# Synthetic T2m field: warm tropics, cold poles, land-sea contrast\nt2m = [\n    280.0 + 25.0 * cosd(la) +\n    3.0 * sind(2lo) * cosd(la) +\n    5.0 * sind(3la) * cosd(2lo) +\n    2.0 * cosd(5lo + 2la)\n    for la in lat, lo in lon\n]\n\nfig = Figure(size=(900, 450))\nax = Axis(fig[1, 1],\n    xlabel=\"Longitude (°)\", ylabel=\"Latitude (°)\",\n    title=\"2m Temperature — 24h Forecast (2024-06-16 00Z)\",\n)\nhm = heatmap!(ax, lon, lat, t2m', colormap=Reverse(:RdBu), colorrange=(235, 315))\nColorbar(fig[1, 2], hm, label=\"Temperature (K)\")\nfig\n\n\n\n\n\n\nFigure 2.1: 2-meter temperature (K) — 24-hour forecast valid 2024-06-16 00Z\n\n\n\n\n\n\nForecast Time Series\nTrack a variable at a single grid point across forecast lead times.\n\nhours = 0:6:240\nn = length(hours)\n\n# Synthetic forecast: diurnal cycle + slight warm drift\nt2m_fcst = 288.0 .+ 4.0 .* sin.(2π .* hours ./ 24) .+ 0.015 .* hours .+ 0.8 .* randn(n)\n\n# Synthetic \"truth\": same diurnal cycle, no drift\nt2m_era5 = 288.0 .+ 4.0 .* sin.(2π .* hours ./ 24) .+ 0.5 .* randn(n)\n\nfig = Figure(size=(800, 400))\nax = Axis(fig[1, 1],\n    xlabel=\"Lead time (hours)\", ylabel=\"Temperature (K)\",\n    title=\"T2m Forecast vs. ERA5 — Paris (48.9°N, 2.3°E)\",\n)\nlines!(ax, hours, t2m_era5, label=\"ERA5 analysis\", color=:gray30, linewidth=2)\nlines!(ax, hours, t2m_fcst, label=\"Pangu24 forecast\", color=:steelblue, linewidth=2)\naxislegend(ax, position=:lt)\nfig\n\n\n\n\n\n\nFigure 2.2: 48-hour T2m forecast at a single grid point vs. ERA5 analysis\n\n\n\n\n\n\nEnsemble Spread\nRun an ensemble forecast to quantify uncertainty:\n\nio_ens = ZarrBackend(\"/tmp/ensemble.zarr\")\nperturb = SphericalGaussian()\nresult = run_ensemble(DateTime(2024, 6, 15), 40, 10, model, ds, io_ens, perturb)\n\nVisualize the ensemble envelope:\n\nhours_ens = 0:6:240\nn_ens = length(hours_ens)\nn_members = 10\n\n# Synthetic ensemble: members diverge over time\nbase = 288.0 .+ 4.0 .* sin.(2π .* hours_ens ./ 24)\nmembers = hcat([base .+ cumsum(0.3 .* randn(n_ens)) for _ in 1:n_members]...)\n\nens_mean = vec(mean(members, dims=2))\nens_min = vec(minimum(members, dims=2))\nens_max = vec(maximum(members, dims=2))\nens_p25 = vec(mapslices(x -&gt; sort(x)[3], members, dims=2))\nens_p75 = vec(mapslices(x -&gt; sort(x)[8], members, dims=2))\n\nfig = Figure(size=(800, 400))\nax = Axis(fig[1, 1],\n    xlabel=\"Lead time (hours)\", ylabel=\"Temperature (K)\",\n    title=\"Ensemble Forecast — T2m at Paris (48.9°N, 2.3°E)\",\n)\nband!(ax, hours_ens, ens_min, ens_max, color=(:steelblue, 0.15), label=\"Min–Max\")\nband!(ax, hours_ens, ens_p25, ens_p75, color=(:steelblue, 0.3), label=\"25th–75th pct\")\nlines!(ax, hours_ens, ens_mean, color=:steelblue, linewidth=2.5, label=\"Ensemble mean\")\naxislegend(ax, position=:lt)\nfig\n\n\n\n\n\n\nFigure 2.3: 10-member ensemble forecast of T2m showing spread growth with lead time\n\n\n\n\n\n\nVerification: RMSE by Lead Time\nCompare forecast skill across models:\n\nhours_v = 0:6:240\nn_v = length(hours_v)\n\n# Synthetic RMSE curves: persistence grows fast, AI models grow slowly\nrmse_persist = 10.0 .+ 3.5 .* sqrt.(hours_v)\nrmse_pangu   = 10.0 .+ 0.8 .* hours_v .^ 0.65\nrmse_gcst    = 12.0 .+ 0.7 .* hours_v .^ 0.65\nrmse_fcn     = 14.0 .+ 1.0 .* hours_v .^ 0.65\n\nfig = Figure(size=(800, 400))\nax = Axis(fig[1, 1],\n    xlabel=\"Lead time (hours)\", ylabel=\"RMSE (m²/s²)\",\n    title=\"Z500 RMSE — Global\",\n)\nlines!(ax, hours_v, rmse_persist, label=\"Persistence\", color=:gray60, linewidth=2, linestyle=:dash)\nlines!(ax, hours_v, rmse_pangu, label=\"Pangu24\", color=:steelblue, linewidth=2)\nlines!(ax, hours_v, rmse_gcst, label=\"GraphCast\", color=:firebrick, linewidth=2)\nlines!(ax, hours_v, rmse_fcn, label=\"FourCastNet\", color=:goldenrod, linewidth=2)\naxislegend(ax, position=:lt)\nfig\n\n\n\n\n\n\nFigure 2.4: Global RMSE of 500 hPa geopotential height by lead time",
+    "section": "Prognostic models",
+    "text": "Prognostic models\n\npkg   = Earth2Studio.models.px.FCN.load_default_package()\nmodel = Earth2Studio.models.px.FCN.load_model(pkg)\nmodel.to(\"cuda\")",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "tutorial.html#next-steps",
-    "href": "tutorial.html#next-steps",
+    "objectID": "tutorial.html#diagnostic-models",
+    "href": "tutorial.html#diagnostic-models",
     "title": "Tutorial",
-    "section": "Next Steps",
-    "text": "Next Steps\n\nSwap WB2ERA5() for GFS() or ARCO() to use different initial condition sources.\nTry ensemble methods: Gaussian(), BredVector(), LaggedEnsemble().\nAdd diagnostic models: run_diagnostic(...) with PrecipitationAFNO() or CorrDiff().\nCompute verification scores: RMSE(), ACC(), CRPS().",
+    "section": "Diagnostic models",
+    "text": "Diagnostic models\n\npkg = Earth2Studio.models.dx.PrecipitationAFNO.load_default_package()\ndx  = Earth2Studio.models.dx.PrecipitationAFNO.load_model(pkg)",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "data-sources.html",
-    "href": "data-sources.html",
-    "title": "Data Sources",
-    "section": "",
-    "text": "Available Sources\nData sources provide initial conditions and verification data for weather forecasts. Each source wraps an earth2studio.data Python class and returns data as xarray DataArrays.",
+    "objectID": "tutorial.html#workflows",
+    "href": "tutorial.html#workflows",
+    "title": "Tutorial",
+    "section": "Workflows",
+    "text": "Workflows\n\nusing Dates\n\nbackend = Earth2Studio.io.ZarrBackend(\"/tmp/forecast.zarr\")\n\n# Deterministic\nEarth2Studio.run.deterministic([DateTime(2023, 6, 15)], 10, model, ds, backend)\n\n# Ensemble\nperturb = Earth2Studio.perturbation.SphericalGaussian()\nEarth2Studio.run.ensemble([DateTime(2023, 6, 15)], 10, 4, model, ds, backend, perturb; batch_size=4)\n\n# Diagnostic\nEarth2Studio.run.diagnostic([DateTime(2023, 6, 15)], 10, model, dx, ds, backend)",
     "crumbs": [
       "Docs",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Data Sources</span>"
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "data-sources.html#available-sources",
-    "href": "data-sources.html#available-sources",
-    "title": "Data Sources",
-    "section": "",
-    "text": "Constructor\nDescription\n\n\n\n\nARCO()\nGoogle Analysis-Ready, Cloud-Optimized ERA5\n\n\nGFS()\nNOAA Global Forecast System analysis\n\n\nGFS_FS()\nNOAA GFS forecast data\n\n\nIFS()\nECMWF Integrated Forecasting System\n\n\nCDS()\nCopernicus Climate Data Store\n\n\nNCAR_ERA5()\nNCAR Research Data Archive ERA5\n\n\nWB2ERA5()\nWeatherBench2 ERA5 (cloud-hosted on GCS)\n\n\nWB2Climatology()\nWeatherBench2 climatology\n\n\nGOES()\nGOES satellite imagery\n\n\nMRMS()\nMulti-Radar Multi-Sensor precipitation\n\n\nHRRR()\nNOAA High-Resolution Rapid Refresh analysis\n\n\nHRRR_FX()\nNOAA HRRR forecast data",
+    "objectID": "tutorial.html#io-backends",
+    "href": "tutorial.html#io-backends",
+    "title": "Tutorial",
+    "section": "IO backends",
+    "text": "IO backends\n\nEarth2Studio.io.ZarrBackend(\"/tmp/out.zarr\")\nEarth2Studio.io.NetCDF4Backend(\"/tmp/out.nc\")\nEarth2Studio.io.AsyncZarrBackend(\"/tmp/out.zarr\")\nEarth2Studio.io.XarrayBackend()\nEarth2Studio.io.KVBackend()",
     "crumbs": [
       "Docs",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Data Sources</span>"
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "data-sources.html#fetching-data",
-    "href": "data-sources.html#fetching-data",
-    "title": "Data Sources",
-    "section": "Fetching Data",
-    "text": "Fetching Data\nAll data sources are callable. Pass a time (or vector of times) and variable name(s):\nusing Earth2Studio, Dates\n\nds = WB2ERA5()\n\n# Fetch a single variable at one time\nda = ds(DateTime(2024, 1, 1), \"t2m\")\n\n# Fetch multiple variables at multiple times\nda = ds([DateTime(2024, 1, 1), DateTime(2024, 1, 2)], [\"t2m\", \"u10m\", \"v10m\"])",
+    "objectID": "tutorial.html#statistics",
+    "href": "tutorial.html#statistics",
+    "title": "Tutorial",
+    "section": "Statistics",
+    "text": "Statistics\n\nm = Earth2Studio.statistics.rmse(reduction_dimensions=[\"time\"])\nm = Earth2Studio.statistics.acc(reduction_dimensions=[\"time\"])\nm = Earth2Studio.statistics.crps(ensemble_dimension=\"ensemble\")",
     "crumbs": [
       "Docs",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Data Sources</span>"
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
-    "objectID": "data-sources.html#converting-to-julia-arrays",
-    "href": "data-sources.html#converting-to-julia-arrays",
-    "title": "Data Sources",
-    "section": "Converting to Julia Arrays",
-    "text": "Converting to Julia Arrays\nUse fetch_data for a one-call Julia-native result:\nresult = fetch_data(ds, DateTime(2024, 1, 1), [\"t2m\", \"msl\"])\n\nresult.data    # Array of values\nresult.dims    # e.g. (:time, :variable, :lat, :lon)\nresult.coords  # NamedTuple of coordinate vectors\nOr use xarray_to_dict on any xarray DataArray:\nda = ds(DateTime(2024, 1, 1), \"t2m\")\nresult = xarray_to_dict(da)",
+    "objectID": "tutorial.html#bringing-results-back-to-julia",
+    "href": "tutorial.html#bringing-results-back-to-julia",
+    "title": "Tutorial",
+    "section": "Bringing results back to Julia",
+    "text": "Bringing results back to Julia\n\nusing PythonCall\n\n# numpy / xarray array → Julia\na_jl   = pyconvert(Array, da.values)   # copies\na_view = PyArray(da.values)            # zero-copy view\n\nRefer to the PythonCall.jl docs for more conversion utilities, and to the earth2studio docs for the Python API itself.",
     "crumbs": [
       "Docs",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Data Sources</span>"
-    ]
-  },
-  {
-    "objectID": "data-sources.html#custom-data-sources",
-    "href": "data-sources.html#custom-data-sources",
-    "title": "Data Sources",
-    "section": "Custom Data Sources",
-    "text": "Custom Data Sources\nConstruct from any earth2studio.data class name:\nds = DataSource(\"CDS\"; kwargs...)",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Data Sources</span>"
-    ]
-  },
-  {
-    "objectID": "models.html",
-    "href": "models.html",
-    "title": "Models",
-    "section": "",
-    "text": "Prognostic Models\nEarth2Studio.jl wraps two categories of AI weather models: prognostic models that step the atmosphere forward in time, and diagnostic models that derive additional quantities from the forecast state.\nPrognostic models produce multi-step weather forecasts. Each constructor downloads pretrained weights on first use.",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Models</span>"
-    ]
-  },
-  {
-    "objectID": "models.html#prognostic-models",
-    "href": "models.html#prognostic-models",
-    "title": "Models",
-    "section": "",
-    "text": "Constructor\nDescription\nStep Size\n\n\n\n\nFourCastNet()\nNVIDIA FourCastNet v1/v2\n6h\n\n\nFCN3()\nFourCastNet v3\n6h\n\n\nPangu24()\nPangu-Weather\n24h\n\n\nPangu6()\nPangu-Weather\n6h\n\n\nPangu3()\nPangu-Weather\n3h\n\n\nGraphCast()\nDeepMind GraphCast (small)\n6h\n\n\nGraphCastOper()\nGraphCast operational\n6h\n\n\nAIFS()\nECMWF AIFS\n6h\n\n\nAIFSENS()\nECMWF AIFS ensemble\n6h\n\n\nAurora()\nMicrosoft Aurora\n6h\n\n\nFengWu()\nShanghai AI Lab FengWu\n6h\n\n\nDLWP()\nDeep Learning Weather Prediction\n6h\n\n\nStormCast()\nNVIDIA StormCast (convective)\nvaries\n\n\nInterpModAFNO()\nInterpolation model (AFNO)\nvaries\n\n\nPersistence()\nNo-skill baseline\nany\n\n\n\n\nLoading a Model\nmodel = Pangu24()\nModels are loaded on CPU by default. Move to GPU with:\nto_device!(model, \"cuda\")\n\n\nCustom Package Path\nOverride the default weight package:\nmodel = Pangu24(package=\"/path/to/custom/weights\")\nOr construct from any class name:\nmodel = PrognosticModel(\"FCN\")",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Models</span>"
-    ]
-  },
-  {
-    "objectID": "models.html#diagnostic-models",
-    "href": "models.html#diagnostic-models",
-    "title": "Models",
-    "section": "Diagnostic Models",
-    "text": "Diagnostic Models\nDiagnostic models transform forecast fields into derived quantities. AI-based diagnostics load pretrained weights; derived quantities are analytic.\n\nAI-Based Diagnostics\n\n\n\nConstructor\nDescription\n\n\n\n\nCorrDiff()\nGenerative downscaling\n\n\nCorrDiffTaiwan()\nCorrDiff (Taiwan domain)\n\n\nCorrDiffCMIP6()\nCorrDiff (CMIP6 data)\n\n\nPrecipitationAFNO()\nPrecipitation estimation\n\n\nPrecipitationAFNOv2()\nPrecipitation estimation v2\n\n\nClimateNet()\nExtreme weather detection\n\n\nSolarRadiationAFNO1H()\nSolar radiation (1h)\n\n\nSolarRadiationAFNO6H()\nSolar radiation (6h)\n\n\nTCTrackerVitart()\nTC tracker (Vitart)\n\n\nTCTrackerWuDuan()\nTC tracker (Wu-Duan)\n\n\n\n\n\nDerived Quantities (No Weights)\n\n\n\nConstructor\nDescription\n\n\n\n\nDerivedRH()\nRelative humidity\n\n\nDerivedVPD()\nVapor pressure deficit\n\n\nDerivedWS()\nWind speed\n\n\n\n\n\nCustom Diagnostic\nmodel = DiagnosticModel(\"CorrDiff\")",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Models</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html",
-    "href": "workflows.html",
-    "title": "Workflows",
-    "section": "",
-    "text": "Deterministic Forecast\nEarth2Studio.jl provides three standard forecast workflows. Each writes results into an IO backend and returns it for further analysis.\nRun a single-member forecast:\nArguments:",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html#deterministic-forecast",
-    "href": "workflows.html#deterministic-forecast",
-    "title": "Workflows",
-    "section": "",
-    "text": "using Earth2Studio, Dates\n\ndata = GFS()\nmodel = Pangu24()\nio = ZarrBackend(\"/tmp/deterministic.zarr\")\n\nresult = run_deterministic(DateTime(2024, 1, 1), 10, model, data, io)\nds = to_xarray(result)\n\n\ntime: Initial time (DateTime, Date, or vector)\nnsteps: Number of forecast steps\nprognostic: A PrognosticModel\ndata: A DataSource\nio: An IOBackend\ndevice (keyword): \"cuda\" or \"cpu\" (default: model’s current device)",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html#ensemble-forecast",
-    "href": "workflows.html#ensemble-forecast",
-    "title": "Workflows",
-    "section": "Ensemble Forecast",
-    "text": "Ensemble Forecast\nRun a multi-member ensemble with perturbations:\ndata = GFS()\nmodel = Pangu24()\nio = ZarrBackend(\"/tmp/ensemble.zarr\")\nperturb = Gaussian()\n\nresult = run_ensemble(DateTime(2024, 1, 1), 10, 4, model, data, io, perturb)\nds = to_xarray(result)\nAdditional arguments:\n\nnensemble: Number of ensemble members\nperturbation: A Perturbation method\nbatch_size (keyword): GPU batch size (default: nensemble)",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html#diagnostic-forecast",
-    "href": "workflows.html#diagnostic-forecast",
-    "title": "Workflows",
-    "section": "Diagnostic Forecast",
-    "text": "Diagnostic Forecast\nApply a diagnostic model at each forecast step:\ndata = GFS()\npx_model = Pangu24()\ndx_model = PrecipitationAFNO()\nio = ZarrBackend(\"/tmp/diagnostic.zarr\")\n\nresult = run_diagnostic(DateTime(2024, 1, 1), 10, px_model, dx_model, data, io)\nds = to_xarray(result)",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html#io-backends",
-    "href": "workflows.html#io-backends",
-    "title": "Workflows",
-    "section": "IO Backends",
-    "text": "IO Backends\nChoose where to store forecast results:\n\n\n\nConstructor\nDescription\n\n\n\n\nZarrBackend(path)\nZarr store on disk\n\n\nAsyncZarrBackend(path)\nAsynchronous Zarr store\n\n\nNetCDF4Backend(path)\nNetCDF4 file\n\n\nXarrayBackend()\nIn-memory xarray Dataset\n\n\nKVBackend()\nKey-value store",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html#perturbation-methods",
-    "href": "workflows.html#perturbation-methods",
-    "title": "Workflows",
-    "section": "Perturbation Methods",
-    "text": "Perturbation Methods\nMethods for generating ensemble spread:\n\n\n\nConstructor\nDescription\n\n\n\n\nGaussian()\nGaussian noise\n\n\nSphericalGaussian()\nLatitude-weighted Gaussian\n\n\nCorrelatedSphericalGaussian()\nCorrelated spherical Gaussian\n\n\nBrown()\nBrownian noise\n\n\nBredVector()\nBred vector method\n\n\nLaggedEnsemble()\nLagged average ensemble\n\n\nHemisphericCentredBredVector()\nHemispheric-centred bred vectors\n\n\nZero()\nNo perturbation (deterministic ensemble)",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "workflows.html#reading-results",
-    "href": "workflows.html#reading-results",
-    "title": "Workflows",
-    "section": "Reading Results",
-    "text": "Reading Results\nAfter a workflow completes, extract the xarray Dataset:\nds = to_xarray(result)\nConvert to Julia arrays:\njulia_data = xarray_to_dict(ds[\"t2m\"])\njulia_data.data    # Array\njulia_data.dims    # Tuple of dimension names\njulia_data.coords  # NamedTuple of coordinate vectors",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Workflows</span>"
-    ]
-  },
-  {
-    "objectID": "statistics.html",
-    "href": "statistics.html",
-    "title": "Statistics",
-    "section": "",
-    "text": "Available Metrics\nEarth2Studio.jl wraps verification metrics from earth2studio.statistics for evaluating forecast quality.",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Statistics</span>"
-    ]
-  },
-  {
-    "objectID": "statistics.html#available-metrics",
-    "href": "statistics.html#available-metrics",
-    "title": "Statistics",
-    "section": "",
-    "text": "Constructor\nDescription\n\n\n\n\nRMSE()\nRoot Mean Square Error\n\n\nMSE()\nMean Squared Error\n\n\nMAE()\nMean Absolute Error\n\n\nACC()\nAnomaly Correlation Coefficient\n\n\nCRPS()\nContinuous Ranked Probability Score\n\n\nFSS()\nFractions Skill Score\n\n\nVariance()\nVariance\n\n\nMean()\nMean\n\n\nSpreadSkillRatio()\nEnsemble spread-skill ratio\n\n\nRankHistogram()\nRank histogram (reliability)\n\n\nBrierScore()\nBrier Score (probabilistic binary)\n\n\nLogScore()\nLogarithmic scoring rule\n\n\nReliabilityDiagram()\nReliability diagram data",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Statistics</span>"
-    ]
-  },
-  {
-    "objectID": "statistics.html#usage",
-    "href": "statistics.html#usage",
-    "title": "Statistics",
-    "section": "Usage",
-    "text": "Usage\nConstruct a metric with reduction dimensions, then call it on forecast and observation data:\nmetric = RMSE(reduction_dimensions=[\"lat\", \"lon\"])\nscore = metric(forecast_da, observation_da)",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Statistics</span>"
-    ]
-  },
-  {
-    "objectID": "statistics.html#custom-metrics",
-    "href": "statistics.html#custom-metrics",
-    "title": "Statistics",
-    "section": "Custom Metrics",
-    "text": "Custom Metrics\nConstruct from any earth2studio.statistics function name:\nmetric = Statistic(\"rmse\"; reduction_dimensions=String[])",
-    "crumbs": [
-      "Docs",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Statistics</span>"
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Tutorial</span>"
     ]
   },
   {
@@ -301,43 +125,21 @@
     "href": "api.html",
     "title": "API",
     "section": "",
-    "text": "Types",
+    "text": "Python module references\nNothing is exported. Access each reference as Earth2Studio.&lt;name&gt;.",
     "crumbs": [
       "API",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>API</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>API</span>"
     ]
   },
   {
-    "objectID": "api.html#types",
-    "href": "api.html#types",
+    "objectID": "api.html#python-module-references",
+    "href": "api.html#python-module-references",
     "title": "API",
     "section": "",
-    "text": "DataSource\n\n\nDataSource\nWrapper around an earth2studio.data.* Python data source object.\nConstruct via named constructors like ARCO, GFS, etc.\nDataSource(class_name::AbstractString; kwargs...)\nConstruct a DataSource from an arbitrary earth2studio.data class name.\n\nExamples\nds = DataSource(\"CDS\")\n\n\n\n\n\nDiagnosticModel\n\n\nDiagnosticModel\nWrapper around an earth2studio.models.dx.* diagnostic model.\nConstruct via named constructors like CorrDiff, ClimateNet, etc.\nDiagnosticModel(class_name::AbstractString; kwargs...)\nConstruct a DiagnosticModel from an arbitrary earth2studio.models.dx class name.\n\nExamples\nmodel = DiagnosticModel(\"CorrDiff\")\n\n\n\n\n\nIOBackend\n\n\nIOBackend\nWrapper around an earth2studio.io.* IO backend for storing forecast results.\nConstruct via named constructors like ZarrBackend, NetCDF4Backend, etc.\nIOBackend(class_name::AbstractString, args...; kwargs...)\nConstruct an IOBackend from an arbitrary earth2studio.io class name.\n\nExamples\nio = IOBackend(\"ZarrBackend\", \"/tmp/output.zarr\")\n\n\n\n\n\nPerturbation\n\n\nPerturbation\nWrapper around an earth2studio.perturbation.* perturbation method.\nConstruct via named constructors like Gaussian, Zero, etc.\nPerturbation(class_name::AbstractString; kwargs...)\nConstruct a Perturbation from an arbitrary earth2studio.perturbation class name.\n\nExamples\np = Perturbation(\"Gaussian\"; noise_amplitude=0.05)\n\n\n\n\n\nPrognosticModel\n\n\nPrognosticModel\nWrapper around an earth2studio.models.px.* prognostic (forecast) model.\nConstruct via named constructors like FourCastNet, Pangu24, etc.\nPrognosticModel(class_name::AbstractString; kwargs...)\nConstruct a PrognosticModel from an arbitrary earth2studio.models.px class name.\n\nExamples\nmodel = PrognosticModel(\"FCN\")\n\n\n\n\n\nStatistic\n\n\nStatistic\nWrapper around an earth2studio.statistics.* verification metric.\nConstruct via named constructors like RMSE, ACC, etc.\nStatistic(name::AbstractString; kwargs...)\nConstruct a Statistic from an arbitrary earth2studio.statistics function name.\n\nExamples\ns = Statistic(\"rmse\"; reduction_dimensions=String[])",
+    "text": "Earth2Studio.data\n\n\nEarth2Studio.data :: Py\nearth2studio.data — data sources (e.g. data.ARCO, data.GFS, data.WB2ERA5).\n\n\n\n\nEarth2Studio.earth2studio\n\n\nEarth2Studio.earth2studio :: Py\nTop-level earth2studio Python module.\n\n\n\n\nEarth2Studio.io\n\n\nEarth2Studio.io :: Py\nearth2studio.io — output backends (e.g. io.ZarrBackend, io.NetCDF4Backend).\n\n\n\n\nEarth2Studio.models\n\n\nEarth2Studio.models :: Py\nearth2studio.models — prognostic (models.px) and diagnostic (models.dx) model classes.\n\n\n\n\nEarth2Studio.perturbation\n\n\nEarth2Studio.perturbation :: Py\nearth2studio.perturbation — ensemble perturbation methods (e.g. perturbation.Gaussian, perturbation.BredVector).\n\n\n\n\nEarth2Studio.run\n\n\nEarth2Studio.run :: Py\nearth2studio.run — inference workflows (run.deterministic, run.ensemble, run.diagnostic).\n\n\n\n\nEarth2Studio.statistics\n\n\nEarth2Studio.statistics :: Py\nearth2studio.statistics — verification metrics (e.g. statistics.rmse, statistics.acc, statistics.crps).\n\n\n\n\nEarth2Studio.utils\n\n\nEarth2Studio.utils :: Py\nearth2studio.utils — miscellaneous utilities from the upstream package.",
     "crumbs": [
       "API",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>API</span>"
-    ]
-  },
-  {
-    "objectID": "api.html#functions",
-    "href": "api.html#functions",
-    "title": "API",
-    "section": "Functions",
-    "text": "Functions\n\n\nACC\n\n\nACC(; kwargs...)\nAnomaly Correlation Coefficient metric.\n\n\n\n\nAIFS\n\n\nAIFS(; kwargs...)\nECMWF AIFS (Artificial Intelligence Forecasting System) model.\n\n\n\n\nAIFSENS\n\n\nAIFSENS(; kwargs...)\nECMWF AIFS ensemble model variant.\n\n\n\n\nARCO\n\n\nARCO(; kwargs...)\nGoogle’s Analysis-Ready, Cloud-Optimized ERA5 dataset.\n\n\n\n\nAsyncZarrBackend\n\n\nAsyncZarrBackend(path::AbstractString; kwargs...)\nAsyncZarrBackend(; kwargs...)\nAsynchronous Zarr storage backend.\n\n\n\n\nAurora\n\n\nAurora(; kwargs...)\nMicrosoft Aurora foundation model for weather.\n\n\n\n\nBredVector\n\n\nBredVector(; kwargs...)\nBred vector ensemble perturbation method.\n\n\n\n\nBrierScore\n\n\nBrierScore(; kwargs...)\nBrier Score for probabilistic binary forecasts.\n\n\n\n\nBrown\n\n\nBrown(; kwargs...)\nBrownian noise perturbation.\n\n\n\n\nCDS\n\n\nCDS(; kwargs...)\nCopernicus Climate Data Store data source.\n\n\n\n\nCRPS\n\n\nCRPS(; kwargs...)\nContinuous Ranked Probability Score metric.\n\n\n\n\nClimateNet\n\n\nClimateNet(; kwargs...)\nClimateNet extreme weather event detection model.\n\n\n\n\nCorrDiff\n\n\nCorrDiff(; kwargs...)\nNVIDIA CorrDiff generative downscaling model.\n\n\n\n\nCorrDiffCMIP6\n\n\nCorrDiffCMIP6(; kwargs...)\nCorrDiff model trained on CMIP6 data.\n\n\n\n\nCorrDiffTaiwan\n\n\nCorrDiffTaiwan(; kwargs...)\nCorrDiff model trained on Taiwan domain.\n\n\n\n\nCorrelatedSphericalGaussian\n\n\nCorrelatedSphericalGaussian(; kwargs...)\nCorrelated spherical Gaussian perturbation.\n\n\n\n\nDLWP\n\n\nDLWP(; kwargs...)\nDeep Learning Weather Prediction model.\n\n\n\n\nDerivedRH\n\n\nDerivedRH(; kwargs...)\nDerived relative humidity diagnostic (analytic, no model weights).\n\n\n\n\nDerivedVPD\n\n\nDerivedVPD(; kwargs...)\nDerived vapor pressure deficit diagnostic (analytic, no model weights).\n\n\n\n\nDerivedWS\n\n\nDerivedWS(; kwargs...)\nDerived wind speed diagnostic (analytic, no model weights).\n\n\n\n\nFCN3\n\n\nFCN3(; kwargs...)\nFourCastNet v3 global weather model.\n\n\n\n\nFSS\n\n\nFSS(; kwargs...)\nFractions Skill Score metric.\n\n\n\n\nFengWu\n\n\nFengWu(; kwargs...)\nShanghai AI Lab FengWu weather model.\n\n\n\n\nFourCastNet\n\n\nFourCastNet(; kwargs...)\nNVIDIA FourCastNet v1/v2 global weather model.\n\n\n\n\nGFS\n\n\nGFS(; kwargs...)\nNOAA Global Forecast System data source.\n\n\n\n\nGFS_FS\n\n\nGFS_FS(; kwargs...)\nGFS forecast data source (as opposed to analysis).\n\n\n\n\nGOES\n\n\nGOES(; kwargs...)\nGOES satellite imagery data source.\n\n\n\n\nGaussian\n\n\nGaussian(; kwargs...)\nGaussian noise perturbation.\n\n\n\n\nGraphCast\n\n\nGraphCast(; kwargs...)\nDeepMind GraphCast (small variant) weather model.\n\n\n\n\nGraphCastOper\n\n\nGraphCastOper(; kwargs...)\nDeepMind GraphCast operational variant.\n\n\n\n\nHRRR\n\n\nHRRR(; kwargs...)\nNOAA High-Resolution Rapid Refresh analysis data source.\n\n\n\n\nHRRR_FX\n\n\nHRRR_FX(; kwargs...)\nNOAA High-Resolution Rapid Refresh forecast data source.\n\n\n\n\nHemisphericCentredBredVector\n\n\nHemisphericCentredBredVector(; kwargs...)\nHemispheric-centred bred vector perturbation method.\n\n\n\n\nIFS\n\n\nIFS(; kwargs...)\nECMWF Integrated Forecasting System data source.\n\n\n\n\nInterpModAFNO\n\n\nInterpModAFNO(; kwargs...)\nInterpolation model using AFNO backbone.\n\n\n\n\nKVBackend\n\n\nKVBackend(; kwargs...)\nKey-value store backend.\n\n\n\n\nLaggedEnsemble\n\n\nLaggedEnsemble(; kwargs...)\nLagged average ensemble perturbation.\n\n\n\n\nLogScore\n\n\nLogScore(; kwargs...)\nLogarithmic scoring rule for probabilistic forecasts.\n\n\n\n\nMAE\n\n\nMAE(; kwargs...)\nMean Absolute Error metric.\n\n\n\n\nMRMS\n\n\nMRMS(; kwargs...)\nMulti-Radar Multi-Sensor precipitation data source.\n\n\n\n\nMSE\n\n\nMSE(; kwargs...)\nMean Squared Error metric.\n\n\n\n\nMean\n\n\nMean(; kwargs...)\nMean statistic.\n\n\n\n\nNCAR_ERA5\n\n\nNCAR_ERA5(; kwargs...)\nNCAR Research Data Archive ERA5 data source.\n\n\n\n\nNetCDF4Backend\n\n\nNetCDF4Backend(path::AbstractString; kwargs...)\nNetCDF4Backend(; kwargs...)\nNetCDF4 file storage backend.\n\n\n\n\nPangu24\n\n\nPangu24(; kwargs...)\nPangu-Weather 24-hour step model.\n\n\n\n\nPangu3\n\n\nPangu3(; kwargs...)\nPangu-Weather 3-hour step model.\n\n\n\n\nPangu6\n\n\nPangu6(; kwargs...)\nPangu-Weather 6-hour step model.\n\n\n\n\nPersistence\n\n\nPersistence(; kwargs...)\nPersistence (no-skill baseline) forecast model.\n\n\n\n\nPrecipitationAFNO\n\n\nPrecipitationAFNO(; kwargs...)\nAFNO-based precipitation diagnostic model.\n\n\n\n\nPrecipitationAFNOv2\n\n\nPrecipitationAFNOv2(; kwargs...)\nAFNO-based precipitation diagnostic model (v2).\n\n\n\n\nRMSE\n\n\nRMSE(; kwargs...)\nRoot Mean Square Error metric.\n\n\n\n\nRankHistogram\n\n\nRankHistogram(; kwargs...)\nRank histogram for ensemble reliability.\n\n\n\n\nReliabilityDiagram\n\n\nReliabilityDiagram(; kwargs...)\nReliability diagram data for probabilistic forecast calibration.\n\n\n\n\nSolarRadiationAFNO1H\n\n\nSolarRadiationAFNO1H(; kwargs...)\nAFNO-based solar radiation model (1-hour resolution).\n\n\n\n\nSolarRadiationAFNO6H\n\n\nSolarRadiationAFNO6H(; kwargs...)\nAFNO-based solar radiation model (6-hour resolution).\n\n\n\n\nSphericalGaussian\n\n\nSphericalGaussian(; kwargs...)\nSpherical Gaussian noise perturbation (latitude-weighted).\n\n\n\n\nSpreadSkillRatio\n\n\nSpreadSkillRatio(; kwargs...)\nSpread-skill ratio metric for ensemble calibration.\n\n\n\n\nStormCast\n\n\nStormCast(; kwargs...)\nNVIDIA StormCast high-resolution convective model.\n\n\n\n\nTCTrackerVitart\n\n\nTCTrackerVitart(; kwargs...)\nTropical cyclone tracker using Vitart algorithm.\n\n\n\n\nTCTrackerWuDuan\n\n\nTCTrackerWuDuan(; kwargs...)\nTropical cyclone tracker using Wu-Duan algorithm.\n\n\n\n\nVariance\n\n\nVariance(; kwargs...)\nVariance statistic.\n\n\n\n\nWB2Climatology\n\n\nWB2Climatology(; kwargs...)\nWeatherBench2 climatology data source.\n\n\n\n\nWB2ERA5\n\n\nWB2ERA5(; kwargs...)\nWeatherBench2 ERA5 data source (cloud-hosted on GCS).\n\n\n\n\nXarrayBackend\n\n\nXarrayBackend(; kwargs...)\nIn-memory xarray Dataset backend (results stay in Python memory).\n\n\n\n\nZarrBackend\n\n\nZarrBackend(path::AbstractString; kwargs...)\nZarrBackend(; kwargs...)\nZarr storage backend for writing forecast results to disk.\n\n\n\n\nZero\n\n\nZero(; kwargs...)\nZero (no-op) perturbation. Useful for deterministic runs or testing.\n\n\n\n\ndatetime_to_np64\n\n\ndatetime_to_np64(dt::DateTime)\ndatetime_to_np64(d::Date)\nConvert a Julia DateTime or Date to a numpy.datetime64 object.\n\n\n\n\nfetch_data\n\n\nfetch_data(ds::DataSource, time, variable)\nFetch data and return a Julia NamedTuple with fields data, dims, and coords.\n\nExamples\nds = WB2ERA5()\nresult = fetch_data(ds, DateTime(2024, 1, 1), [\"t2m\", \"u10m\"])\nresult.data   # Array{Float32}\nresult.dims   # (:time, :variable, :lat, :lon)\nresult.coords # NamedTuple of coordinate vectors\n\n\n\n\n\nis_pymodule_available\n\n\nNo documentation found for public binding Earth2Studio.is_pymodule_available.\nEarth2Studio.is_pymodule_available is a Function.\n# 1 method for generic function \"is_pymodule_available\" from Earth2Studio:\n [1] is_pymodule_available(key::Symbol)\n     @ ~/work/Earth2Studio.jl/Earth2Studio.jl/src/Earth2Studio.jl:91\n\n\n\n\nnp64_to_datetime\n\n\nnp64_to_datetime(x::Py) -&gt; DateTime\nConvert a numpy.datetime64 Python object back to a Julia DateTime. Nanosecond precision is truncated to seconds.\n\n\n\n\npy_object\n\n\npy_object(x::Earth2StudioObject)\nReturn the underlying Python object wrapped by x.\n\n\n\n\npymodule\n\n\nNo documentation found for public binding Earth2Studio.pymodule.\nEarth2Studio.pymodule is a Function.\n# 1 method for generic function \"pymodule\" from Earth2Studio:\n [1] pymodule(key::Symbol)\n     @ ~/work/Earth2Studio.jl/Earth2Studio.jl/src/Earth2Studio.jl:83\n\n\n\n\npymodule_error\n\n\nNo documentation found for public binding Earth2Studio.pymodule_error.\nEarth2Studio.pymodule_error is a Function.\n# 1 method for generic function \"pymodule_error\" from Earth2Studio:\n [1] pymodule_error(key::Symbol)\n     @ ~/work/Earth2Studio.jl/Earth2Studio.jl/src/Earth2Studio.jl:92\n\n\n\n\nrun_deterministic\n\n\nrun_deterministic(time, nsteps, prognostic, data, io; device=nothing, kwargs...)\nRun a deterministic forecast for nsteps time steps. Returns the IOBackend containing results.\n\nExamples\nio = run_deterministic(DateTime(2024, 1, 1), 10, model, data, ZarrBackend(\"/tmp/out.zarr\"))\nds = to_xarray(io)\n\n\n\n\n\nrun_diagnostic\n\n\nrun_diagnostic(time, nsteps, prognostic, diagnostic, data, io; device=nothing, kwargs...)\nRun a forecast with a diagnostic model applied at each step. Returns the IOBackend containing results.\n\nExamples\nio = run_diagnostic(DateTime(2024,1,1), 10, px_model, dx_model, data, ZarrBackend(\"/tmp/out.zarr\"))\nds = to_xarray(io)\n\n\n\n\n\nrun_ensemble\n\n\nrun_ensemble(time, nsteps, nensemble, prognostic, data, io, perturbation; batch_size=nothing, device=nothing, kwargs...)\nRun an ensemble forecast with nensemble members. Returns the IOBackend containing results.\n\nExamples\nio = run_ensemble(DateTime(2024,1,1), 10, 4, model, data, ZarrBackend(\"/tmp/out.zarr\"), Zero())\nds = to_xarray(io)\n\n\n\n\n\nto_device! {#to_device!}\n\n\nto_device!(model, device::AbstractString)\nMove a prognostic or diagnostic model to the specified device (e.g. \"cuda\", \"cpu\").\n\nExamples\nmodel = Pangu24()\nto_device!(model, \"cuda\")\n\n\n\n\n\nto_xarray\n\n\nto_xarray(io::IOBackend)\nReturn the xarray Dataset stored in an IOBackend after a workflow run completes.\n\nExamples\nio = ZarrBackend(\"/tmp/forecast.zarr\")\nio = run_deterministic(time, 10, model, data, io)\nds = to_xarray(io)\n\n\n\n\n\nxarray_to_dict\n\n\nxarray_to_dict(da::Py) -&gt; NamedTuple\nConvert an xarray DataArray to a Julia NamedTuple with fields data, dims, and coords.\n\nExamples\nresult = fetch_data(ds, DateTime(2024,1,1), \"t2m\")\nresult.data   # Array of values\nresult.dims   # (:time, :variable, :lat, :lon)\nresult.coords # NamedTuple of coordinate vectors",
-    "crumbs": [
-      "API",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>API</span>"
-    ]
-  },
-  {
-    "objectID": "resources/changelog.html",
-    "href": "resources/changelog.html",
-    "title": "Changelog",
-    "section": "",
-    "text": "Unreleased",
-    "crumbs": [
-      "Resources",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Changelog</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>API</span>"
     ]
   }
 ]
