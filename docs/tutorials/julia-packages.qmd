@@ -1,0 +1,99 @@
+---
+title: "Julia packages"
+---
+
+earth2studio returns `xarray` objects from data sources and IO backends. [DimensionalData.jl](https://rafaqz.github.io/DimensionalData.jl/) converts `xarray.DataArray` and `xarray.Dataset` to `DimArray` and `DimStack` without copying the data, and its Makie extension plots the result with labelled axes. The PythonCall integration activates automatically when both packages are loaded.
+
+```{julia}
+#| echo: false
+#| output: false
+# Spawn multiprocessing's resource_tracker with stdio detached so the docs build does not
+# hang on the first zarr chunk decode. See index.qmd for details.
+using PythonCall: pyimport
+redirect_stdio(stdout=devnull, stderr=devnull) do
+    pyimport("multiprocessing.resource_tracker").ensure_running()
+end
+```
+
+```{julia}
+using Earth2Studio
+using Dates
+using DimensionalData
+using CairoMakie
+using PythonCall: pyimport, pyconvert, pylist, pydict
+```
+
+## xarray to DimensionalData
+
+Fetch 2 m temperature and 10 m zonal wind at five times from ARCO ERA5:
+
+```{julia}
+ds = Earth2Studio.data.ARCO(verbose=false)
+t0 = DateTime(2023, 6, 15)
+da = ds(pylist(t0 .+ Hour.(0:6:24)), pylist(["t2m", "u10m"]))
+da.dims
+```
+
+`pyconvert(DimArray, da)` does the conversion, with one preparation step. DimensionalData reads each coordinate as an attribute of the DataArray, and `DataArray.variable` is an xarray property that returns the array's underlying `Variable` rather than the coordinate named `variable`. Rename that dimension before converting:
+
+```{julia}
+A = pyconvert(DimArray, da.rename(variable="field"))
+```
+
+Two things changed. The dimensions are reversed, `(lon, lat, field, time)` in place of `(time, variable, lat, lon)`, because Python stores arrays row-major and Julia column-major. Reversing keeps the fast axis the same in both languages, so no data moves. And the data is shared: `parent(A)` is a `PyArray` viewing the numpy buffer. Pass `copy=true` to get a plain `Array`.
+
+```{julia}
+typeof(parent(A))
+```
+
+The `time` lookup holds numpy `datetime64` values. Replace it with `DateTime` so that selectors take Julia dates and Makie can label the axis:
+
+```{julia}
+A = set(A, :time => pyconvert(Vector{DateTime}, da.time.values))
+lookup(A, :time)
+```
+
+Selectors index by coordinate value. `At` matches exactly and `Near` picks the closest point:
+
+```{julia}
+raleigh = A[field=At("t2m"), lat=Near(35.8), lon=Near(281.3)]
+```
+
+## Plotting with Makie
+
+DimensionalData's Makie extension reads axis labels, ticks, and the title from the dimensions, so a `DimArray` plots without extracting coordinate vectors. The title lists the coordinates that were selected away.
+
+```{julia}
+fig = Figure(size=(900, 450))
+heatmap(fig[1, 1], A[field=At("t2m"), time=At(t0)] .- 273.15; colormap=:thermal)
+fig
+```
+
+```{julia}
+lines(raleigh .- 273.15; axislegend=false)
+```
+
+## Datasets to DimStack
+
+`XarrayBackend` stores a forecast as an `xarray.Dataset` with one data variable per field. `pyconvert(DimStack, ...)` converts each variable to a layer that shares the same dimensions. The setup below is the Persistence forecast from the [Forecasting](forecasting.qmd) tutorial.
+
+```{julia}
+np = pyimport("numpy")
+grid = pydict("lat" => np.linspace(90, -90, 721), "lon" => np.linspace(0, 359.75, 1440))
+model = Earth2Studio.models.px.Persistence("t2m", grid)
+io = Earth2Studio.io.XarrayBackend()
+Earth2Studio.run.deterministic([t0], 4, model, ds, io; verbose=false)
+S = pyconvert(DimStack, io.root)
+```
+
+The `lead_time` lookup holds numpy `timedelta64` values, which convert to `Hour` the same way `time` converts to `DateTime`. Layers are accessed by name and support the same selectors:
+
+```{julia}
+S = set(S, :time => pyconvert(Vector{DateTime}, io.root.time.values),
+           :lead_time => pyconvert(Vector{Hour}, io.root.lead_time.values))
+S[:t2m][lead_time=At(Hour(12)), lat=Near(35.8), lon=Near(281.3)]
+```
+
+## Other packages
+
+[Rasters.jl](https://rafaqz.github.io/Rasters.jl/) and [YAXArrays.jl](https://juliadatacubes.github.io/YAXArrays.jl/) build on DimensionalData, so a converted `DimArray` is their input type once its `lon` and `lat` dimensions are renamed to `X` and `Y`. For a Python-free path, `NetCDF4Backend` writes a file that [NCDatasets.jl](https://juliageo.org/NCDatasets.jl/) and Rasters.jl open directly.

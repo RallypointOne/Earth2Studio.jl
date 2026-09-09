@@ -171,4 +171,6 @@ a_jl   = pyconvert(Array, da.values)   # copies
 a_view = PyArray(da.values)            # zero-copy view
 ```
 
+To keep dimension names and coordinates, convert to a `DimArray` instead; see the [Julia packages](julia-packages.qmd) tutorial.
+
 Refer to the [PythonCall.jl docs](https://juliapy.github.io/PythonCall.jl/stable/) for more conversion utilities, and to the [earth2studio docs](https://nvidia.github.io/earth2studio/) for the Python API itself.

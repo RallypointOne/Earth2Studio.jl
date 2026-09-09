@@ -29,6 +29,7 @@ book:
       chapters:
         - tutorials/basics.qmd
         - tutorials/forecasting.qmd
+        - tutorials/julia-packages.qmd
     - part: "API"
       chapters:
         - api.qmd

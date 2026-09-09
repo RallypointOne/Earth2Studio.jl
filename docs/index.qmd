@@ -4,22 +4,18 @@ title: "Earth2Studio.jl"
 
 ## Overview
 
-**Earth2Studio.jl** is a thin Julia wrapper around [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI-powered weather and climate forecasting. It uses [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) to expose the full `earth2studio` Python API — data sources, prognostic and diagnostic models, perturbations, IO backends, run workflows, and verification statistics — as Python objects you can call from Julia.
-
-The package itself is intentionally minimal: it imports `earth2studio` and its top-level submodules and holds them as `Py` references. Nothing is exported, because upstream names such as `run` and `io` would clash with `Base`. All functionality lives in the upstream Python package.
+Earth2Studio.jl wraps [NVIDIA's earth2studio](https://github.com/NVIDIA/earth2studio) Python package for AI weather and climate forecasting. It holds `earth2studio` and its submodules as [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl) `Py` objects, so the full Python API is callable from Julia. Nothing is exported: upstream names such as `run` and `io` would clash with `Base`.
 
 ## Quickstart
 
-On first `using Earth2Studio`, [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) creates a Conda environment with Python (3.11–3.13), `earth2studio[data]` (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a `CondaPkg.toml` to your own project and CondaPkg merges it with the one shipped here:
+On first `using Earth2Studio`, [CondaPkg.jl](https://github.com/JuliaPy/CondaPkg.jl) installs Python and `earth2studio[data]`. Model extras are opt-in through a `CondaPkg.toml` in your own project:
 
 ```toml
 [pip.deps.earth2studio]
 extras = ["fcn", "pangu"]
 ```
 
-Every reference is accessed through the module, e.g. `Earth2Studio.data`. `DateTime` and `String` convert to the Python types earth2studio expects. See the [Basics](tutorials/basics.qmd) tutorial for the full set of interop patterns, including when a Julia vector must be converted with `pylist`, and the [Forecasting](tutorials/forecasting.qmd) tutorial for running a model.
-
-Fetch a field from ARCO ERA5, bring it back to Julia with [PythonCall.jl](https://github.com/JuliaPy/PythonCall.jl), and plot it with [CairoMakie](https://docs.makie.org):
+See [Basics](tutorials/basics.qmd) for the Julia-to-Python conversion rules, [Forecasting](tutorials/forecasting.qmd) for running a model, and [Julia packages](tutorials/julia-packages.qmd) for moving results into DimensionalData and Makie. The example below fetches a field from ARCO ERA5 and plots it with [CairoMakie](https://docs.makie.org):
 
 ```{julia}
 #| echo: false
