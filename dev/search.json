@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Earth2Studio.jl",
     "section": "",
-    "text": "Overview\nEarth2Studio.jl is a thin Julia wrapper around NVIDIA’s earth2studio Python package for AI-powered weather and climate forecasting. It uses PythonCall.jl to expose the full earth2studio Python API — data sources, prognostic and diagnostic models, perturbations, IO backends, run workflows, and verification statistics — as Python objects you can call from Julia.\nThe package itself is intentionally minimal: it imports earth2studio and its top-level submodules and holds them as Py references. Nothing is exported, because upstream names such as run and io would clash with Base. All functionality lives in the upstream Python package.",
+    "text": "Overview\nEarth2Studio.jl wraps NVIDIA’s earth2studio Python package for AI weather and climate forecasting. It holds earth2studio and its submodules as PythonCall.jl Py objects, so the full Python API is callable from Julia. Nothing is exported: upstream names such as run and io would clash with Base.",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Earth2Studio.jl</span>"
@@ -15,7 +15,7 @@
     "href": "index.html#quickstart",
     "title": "Earth2Studio.jl",
     "section": "Quickstart",
-    "text": "Quickstart\nOn first using Earth2Studio, CondaPkg.jl creates a Conda environment with Python (3.11–3.13), earth2studio[data] (version 0.18 or newer), and the conda-forge packages the data sources need. No manual pip step is required. Model extras are opt-in — add a CondaPkg.toml to your own project and CondaPkg merges it with the one shipped here:\n[pip.deps.earth2studio]\nextras = [\"fcn\", \"pangu\"]\nEvery reference is accessed through the module, e.g. Earth2Studio.data. DateTime and String convert to the Python types earth2studio expects. See the Basics tutorial for the full set of interop patterns, including when a Julia vector must be converted with pylist, and the Forecasting tutorial for running a model.\nFetch a field from ARCO ERA5, bring it back to Julia with PythonCall.jl, and plot it with CairoMakie:\n\nusing Earth2Studio\nusing Dates\nusing CairoMakie\nusing PythonCall: pyconvert\n\nds = Earth2Studio.data.ARCO(verbose=false)\nda = ds(DateTime(2023, 6, 15), \"t2m\")   # xarray.DataArray with dims (time, variable, lat, lon)\n\nlon = pyconvert(Vector, da.lon.values)\nlat = pyconvert(Vector, da.lat.values)\nt2m = pyconvert(Array, da.values)[1, 1, :, :] .- 273.15   # lat × lon, °C\n\nfig = Figure(size=(900, 450))\nax = Axis(fig[1, 1]; title=\"ERA5 2 m temperature, 2023-06-15 00:00 UTC\", xlabel=\"Longitude\", ylabel=\"Latitude\")\nhm = heatmap!(ax, lon, lat, permutedims(t2m))\nColorbar(fig[1, 2], hm; label=\"°C\")\nfig\n\n\nPrecompiling packages...\n   6750.2 ms  ✓ QuartoNotebookWorkerMakieExt (serial)\n  1 dependency successfully precompiled in 7 seconds\nPrecompiling packages...\n   5395.0 ms  ✓ QuartoNotebookWorkerCairoMakieExt (serial)\n  1 dependency successfully precompiled in 6 seconds",
+    "text": "Quickstart\nOn first using Earth2Studio, CondaPkg.jl installs Python and earth2studio[data]. Model extras are opt-in through a CondaPkg.toml in your own project:\n[pip.deps.earth2studio]\nextras = [\"fcn\", \"pangu\"]\nSee Basics for the Julia-to-Python conversion rules, Forecasting for running a model, and Julia packages for moving results into DimensionalData and Makie. The example below fetches a field from ARCO ERA5 and plots it with CairoMakie:\n\nusing Earth2Studio\nusing Dates\nusing CairoMakie\nusing PythonCall: pyconvert\n\nds = Earth2Studio.data.ARCO(verbose=false)\nda = ds(DateTime(2023, 6, 15), \"t2m\")   # xarray.DataArray with dims (time, variable, lat, lon)\n\nlon = pyconvert(Vector, da.lon.values)\nlat = pyconvert(Vector, da.lat.values)\nt2m = pyconvert(Array, da.values)[1, 1, :, :] .- 273.15   # lat × lon, °C\n\nfig = Figure(size=(900, 450))\nax = Axis(fig[1, 1]; title=\"ERA5 2 m temperature, 2023-06-15 00:00 UTC\", xlabel=\"Longitude\", ylabel=\"Latitude\")\nhm = heatmap!(ax, lon, lat, permutedims(t2m))\nColorbar(fig[1, 2], hm; label=\"°C\")\nfig",
     "crumbs": [
       "Docs",
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Earth2Studio.jl</span>"
@@ -125,7 +125,7 @@
     "href": "tutorials/basics.html#bringing-results-back-to-julia",
     "title": "Basics",
     "section": "Bringing results back to Julia",
-    "text": "Bringing results back to Julia\n\nusing PythonCall\n\n# numpy / xarray array → Julia\na_jl   = pyconvert(Array, da.values)   # copies\na_view = PyArray(da.values)            # zero-copy view\n\nRefer to the PythonCall.jl docs for more conversion utilities, and to the earth2studio docs for the Python API itself.",
+    "text": "Bringing results back to Julia\n\nusing PythonCall\n\n# numpy / xarray array → Julia\na_jl   = pyconvert(Array, da.values)   # copies\na_view = PyArray(da.values)            # zero-copy view\n\nTo keep dimension names and coordinates, convert to a DimArray instead; see the Julia packages tutorial.\nRefer to the PythonCall.jl docs for more conversion utilities, and to the earth2studio docs for the Python API itself.",
     "crumbs": [
       "Tutorials",
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Basics</span>"
@@ -187,6 +187,50 @@
     ]
   },
   {
+    "objectID": "tutorials/julia-packages.html",
+    "href": "tutorials/julia-packages.html",
+    "title": "Julia packages",
+    "section": "",
+    "text": "xarray to DimensionalData\nearth2studio returns xarray objects from data sources and IO backends. DimensionalData.jl converts xarray.DataArray and xarray.Dataset to DimArray and DimStack without copying the data, and its Makie extension plots the result with labelled axes. The PythonCall integration activates automatically when both packages are loaded.\nFetch 2 m temperature and 10 m zonal wind at five times from ARCO ERA5:\nds = Earth2Studio.data.ARCO(verbose=false)\nt0 = DateTime(2023, 6, 15)\nda = ds(pylist(t0 .+ Hour.(0:6:24)), pylist([\"t2m\", \"u10m\"]))\nda.dims\n\nPython: ('time', 'variable', 'lat', 'lon')\npyconvert(DimArray, da) does the conversion, with one preparation step. DimensionalData reads each coordinate as an attribute of the DataArray, and DataArray.variable is an xarray property that returns the array’s underlying Variable rather than the coordinate named variable. Rename that dimension before converting:\nA = pyconvert(DimArray, da.rename(variable=\"field\"))\n\n\n┌ 1440×721×2×5 DimArray{Float64, 4} ┐\n├───────────────────────────────────┴──────────────────────────────────── dims ┐\n  ↓ lon Sampled{Float64} [0.0, …, 359.75] ForwardOrdered Irregular Points,\n  → lat Sampled{Float64} [90.0, …, -90.0] ReverseOrdered Irregular Points,\n  ↗ field Categorical{PythonCall.Utils.StaticString{UInt32, 4}} [\"t2m\", \"u10m\"] ForwardOrdered,\n  ⬔ time Sampled{PythonCall.NumpyDates.InlineDateTime64{PythonCall.NumpyDates.MICROSECONDS}} [PythonCall.NumpyDates.InlineDateTime64{PythonCall.NumpyDates.MICROSECONDS}(\"2023-06-15T00:00:00\"), …, PythonCall.NumpyDates.InlineDateTime64{PythonCall.NumpyDates.MICROSECONDS}(\"2023-06-16T00:00:00\")] ForwardOrdered Irregular Points\n└──────────────────────────────────────────────────────────────────────────────┘\n[:, :, 1, 1]\n   ↓ →    90.0     89.75    89.5    …  -89.25   -89.5    -89.75   -90.0\n   0.0   273.981  273.941  273.922     224.077  224.429  224.98   224.723\n   0.25  273.981  273.941  273.921     224.079  224.43   224.985  224.723\n   0.5   273.981  273.941  273.921     224.08   224.434  224.989  224.723\n   ⋮                                ⋱                      ⋮      \n 359.25  273.981  273.941  273.922     224.079  224.424  224.977  224.723\n 359.5   273.981  273.941  273.922     224.079  224.427  224.979  224.723\n 359.75  273.981  273.941  273.922  …  224.077  224.429  224.98   224.723\nTwo things changed. The dimensions are reversed, (lon, lat, field, time) in place of (time, variable, lat, lon), because Python stores arrays row-major and Julia column-major. Reversing keeps the fast axis the same in both languages, so no data moves. And the data is shared: parent(A) is a PyArray viewing the numpy buffer. Pass copy=true to get a plain Array.\ntypeof(parent(A))\n\nPythonCall.PyArray{Float64, 4, true, true, Float64}\nThe time lookup holds numpy datetime64 values. Replace it with DateTime so that selectors take Julia dates and Makie can label the axis:\nA = set(A, :time =&gt; pyconvert(Vector{DateTime}, da.time.values))\nlookup(A, :time)\n\n\nSampled{Dates.DateTime} ForwardOrdered Irregular DimensionalData.Dimensions.Lookups.Points\nwrapping: 5-element Vector{DateTime}:\n 2023-06-15T00:00:00\n 2023-06-15T06:00:00\n 2023-06-15T12:00:00\n 2023-06-15T18:00:00\n 2023-06-16T00:00:00\nSelectors index by coordinate value. At matches exactly and Near picks the closest point:\nraleigh = A[field=At(\"t2m\"), lat=Near(35.8), lon=Near(281.3)]\n\n\n┌ 5-element DimArray{Float64, 1} ┐\n├────────────────────────────────┴─────────────────────────────────────── dims ┐\n  ↓ time Sampled{Dates.DateTime} [Dates.DateTime(\"2023-06-15T00:00:00\"), …, Dates.DateTime(\"2023-06-16T00:00:00\")] ForwardOrdered Irregular Points\n└──────────────────────────────────────────────────────────────────────────────┘\n 2023-06-15T00:00:00  300.231\n 2023-06-15T06:00:00  294.853\n 2023-06-15T12:00:00  294.244\n 2023-06-15T18:00:00  302.782\n 2023-06-16T00:00:00  300.388",
+    "crumbs": [
+      "Tutorials",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Julia packages</span>"
+    ]
+  },
+  {
+    "objectID": "tutorials/julia-packages.html#plotting-with-makie",
+    "href": "tutorials/julia-packages.html#plotting-with-makie",
+    "title": "Julia packages",
+    "section": "Plotting with Makie",
+    "text": "Plotting with Makie\nDimensionalData’s Makie extension reads axis labels, ticks, and the title from the dimensions, so a DimArray plots without extracting coordinate vectors. The title lists the coordinates that were selected away.\n\nfig = Figure(size=(900, 450))\nheatmap(fig[1, 1], A[field=At(\"t2m\"), time=At(t0)] .- 273.15; colormap=:thermal)\nfig\n\n\n\n\n\nlines(raleigh .- 273.15; axislegend=false)",
+    "crumbs": [
+      "Tutorials",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Julia packages</span>"
+    ]
+  },
+  {
+    "objectID": "tutorials/julia-packages.html#datasets-to-dimstack",
+    "href": "tutorials/julia-packages.html#datasets-to-dimstack",
+    "title": "Julia packages",
+    "section": "Datasets to DimStack",
+    "text": "Datasets to DimStack\nXarrayBackend stores a forecast as an xarray.Dataset with one data variable per field. pyconvert(DimStack, ...) converts each variable to a layer that shares the same dimensions. The setup below is the Persistence forecast from the Forecasting tutorial.\n\nnp = pyimport(\"numpy\")\ngrid = pydict(\"lat\" =&gt; np.linspace(90, -90, 721), \"lon\" =&gt; np.linspace(0, 359.75, 1440))\nmodel = Earth2Studio.models.px.Persistence(\"t2m\", grid)\nio = Earth2Studio.io.XarrayBackend()\nEarth2Studio.run.deterministic([t0], 4, model, ds, io; verbose=false)\nS = pyconvert(DimStack, io.root)\n\n\n┌ 1440×721×5×1 DimStack ┐\n├───────────────────────┴──────────────────────────────────────────────── dims ┐\n  ↓ lon Sampled{Float64} [0.0, …, 359.75] ForwardOrdered Irregular Points,\n  → lat Sampled{Float64} [90.0, …, -90.0] ReverseOrdered Irregular Points,\n  ↗ lead_time Sampled{PythonCall.NumpyDates.InlineTimeDelta64{PythonCall.NumpyDates.SECONDS}} [PythonCall.NumpyDates.InlineTimeDelta64{PythonCall.NumpyDates.SECONDS}(0), …, PythonCall.NumpyDates.InlineTimeDelta64{PythonCall.NumpyDates.SECONDS}(86400)] ForwardOrdered Irregular Points,\n  ⬔ time Sampled{PythonCall.NumpyDates.InlineDateTime64{PythonCall.NumpyDates.NANOSECONDS}} [PythonCall.NumpyDates.InlineDateTime64{PythonCall.NumpyDates.NANOSECONDS}(\"2023-06-15T00:00:00\")] ForwardOrdered Irregular Points\n├────────────────────────────────────────────────────────────────────── layers ┤\n  :t2m eltype: Float64 dims: lon, lat, lead_time, time size: 1440×721×5×1\n└──────────────────────────────────────────────────────────────────────────────┘\n\n\n\nThe lead_time lookup holds numpy timedelta64 values, which convert to Hour the same way time converts to DateTime. Layers are accessed by name and support the same selectors:\n\nS = set(S, :time =&gt; pyconvert(Vector{DateTime}, io.root.time.values),\n           :lead_time =&gt; pyconvert(Vector{Hour}, io.root.lead_time.values))\nS[:t2m][lead_time=At(Hour(12)), lat=Near(35.8), lon=Near(281.3)]\n\n\n┌ 1-element DimArray{Float64, 1} t2m ┐\n├────────────────────────────────────┴─────────────────────────────────── dims ┐\n  ↓ time Sampled{Dates.DateTime} [Dates.DateTime(\"2023-06-15T00:00:00\")] ForwardOrdered Irregular Points\n└──────────────────────────────────────────────────────────────────────────────┘\n 2023-06-15T00:00:00  300.231",
+    "crumbs": [
+      "Tutorials",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Julia packages</span>"
+    ]
+  },
+  {
+    "objectID": "tutorials/julia-packages.html#other-packages",
+    "href": "tutorials/julia-packages.html#other-packages",
+    "title": "Julia packages",
+    "section": "Other packages",
+    "text": "Other packages\nRasters.jl and YAXArrays.jl build on DimensionalData, so a converted DimArray is their input type once its lon and lat dimensions are renamed to X and Y. For a Python-free path, NetCDF4Backend writes a file that NCDatasets.jl and Rasters.jl open directly.",
+    "crumbs": [
+      "Tutorials",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Julia packages</span>"
+    ]
+  },
+  {
     "objectID": "api.html",
     "href": "api.html",
     "title": "API",
@@ -194,7 +238,7 @@
     "text": "Python module references\nNothing is exported. Access each reference as Earth2Studio.&lt;name&gt;.",
     "crumbs": [
       "API",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>API</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>API</span>"
     ]
   },
   {
@@ -205,7 +249,7 @@
     "text": "Earth2Studio.data\n\n\nEarth2Studio.data :: Py\nearth2studio.data — data sources (e.g. data.ARCO, data.GFS, data.WB2ERA5).\n\n\n\n\nEarth2Studio.earth2studio\n\n\nEarth2Studio.earth2studio :: Py\nTop-level earth2studio Python module.\n\n\n\n\nEarth2Studio.io\n\n\nEarth2Studio.io :: Py\nearth2studio.io — output backends (e.g. io.ZarrBackend, io.NetCDF4Backend).\n\n\n\n\nEarth2Studio.models\n\n\nEarth2Studio.models :: Py\nearth2studio.models — prognostic (models.px) and diagnostic (models.dx) model classes.\n\n\n\n\nEarth2Studio.perturbation\n\n\nEarth2Studio.perturbation :: Py\nearth2studio.perturbation — ensemble perturbation methods (e.g. perturbation.Gaussian, perturbation.BredVector).\n\n\n\n\nEarth2Studio.run\n\n\nEarth2Studio.run :: Py\nearth2studio.run — inference workflows (run.deterministic, run.ensemble, run.diagnostic).\n\n\n\n\nEarth2Studio.statistics\n\n\nEarth2Studio.statistics :: Py\nearth2studio.statistics — verification metrics (e.g. statistics.rmse, statistics.acc, statistics.crps).\n\n\n\n\nEarth2Studio.utils\n\n\nEarth2Studio.utils :: Py\nearth2studio.utils — miscellaneous utilities from the upstream package.",
     "crumbs": [
       "API",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>API</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>API</span>"
     ]
   }
 ]

@@ -208,6 +208,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <a href="../tutorials/forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Forecasting</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/julia-packages.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Julia packages</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -457,6 +462,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>a_jl   <span class="op">=</span> <span class="fu">pyconvert</span>(<span class="dt">Array</span>, da.values)   <span class="co"># copies</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>a_view <span class="op">=</span> <span class="fu">PyArray</span>(da.values)            <span class="co"># zero-copy view</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>To keep dimension names and coordinates, convert to a <code>DimArray</code> instead; see the <a href="../tutorials/julia-packages.html">Julia packages</a> tutorial.</p>
 <p>Refer to the <a href="https://juliapy.github.io/PythonCall.jl/stable/">PythonCall.jl docs</a> for more conversion utilities, and to the <a href="https://nvidia.github.io/earth2studio/">earth2studio docs</a> for the Python API itself.</p>
 
 
@@ -882,7 +888,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Built on 2026-09-08</p>
+<p>Built on 2026-09-09</p>
 </div>
     <div class="nav-footer-right">
       &nbsp;
