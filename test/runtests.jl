@@ -52,11 +52,9 @@ end
     @test pyis(Earth2Studio.utils,        pyimport("earth2studio.utils"))
 end
 
-#-------------------------------------------------------------------------------# SSL certificate bundle
-@testset "SSL_CERT_FILE points Python at an existing bundle" begin
-    environ = pyimport("os").environ
-    @test pyconvert(Bool, environ.__contains__("SSL_CERT_FILE"))
-    @test isfile(pyconvert(String, environ["SSL_CERT_FILE"]))
+#-------------------------------------------------------------------------------# TLS certificates
+@testset "Python's ssl verifies with the OS trust store (truststore)" begin
+    @test pyis(pyimport("ssl").SSLContext, pyimport("truststore").SSLContext)
 end
 
 #-------------------------------------------------------------------------------# Reachable upstream API

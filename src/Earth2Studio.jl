@@ -1,6 +1,6 @@
 module Earth2Studio
 
-using PythonCall: PythonCall, Py, pyimport, pyconvert, pynew, pycopy!, pycontains
+using PythonCall: PythonCall, Py, pyimport, pynew, pycopy!
 
 #-------------------------------------------------------------------------------# Python module references
 """
@@ -26,37 +26,22 @@ for (name, desc) in SUBMODULES
 end
 
 function __init__()
-    _ensure_ssl_cert_file()
+    # Make HTTPS work for Python. Inside Julia, Python's `ssl` module binds to the OpenSSL that
+    # Julia already loaded, whose default CA bundle path is a build-machine path that does not
+    # exist, so remote data sources (ARCO, WB2ERA5, CDS, ...) fail certificate verification.
+    # truststore makes Python verify against the OS trust store instead. Unlike setting
+    # SSL_CERT_FILE, it changes nothing outside Python, so Julia's own HTTPS clients are unaffected.
+    # It must run before importing earth2studio: aiohttp creates its SSL context at import time.
+    pyimport("truststore").inject_into_ssl()
+    # Make the eccodes bindings load the conda libeccodes that pygrib links. By default findlibs
+    # prefers the eccodeslib wheel (required by earth2studio[data]), and two different libeccodes
+    # versions in one process crash on import.
+    pyimport("os").environ.setdefault("FINDLIBS_DISABLE_PACKAGE", "yes")
     pycopy!(earth2studio, pyimport("earth2studio"))
     for (name, _) in SUBMODULES
         pycopy!(getfield(@__MODULE__, name), pyimport("earth2studio.$name"))
     end
     return nothing
-end
-
-#----------------------------------------------------------------------------# ensure_ssl_cert_file
-# Make HTTPS work for Python inside the CondaPkg environment on macOS.
-#
-# Problem: The OpenSSL bundled with Conda Python on macOS looks for its trusted root certificates
-# (the CA bundle) at a path fixed at build time. That path does not exist when the environment is
-# installed under .CondaPkg/, so every TLS connection fails with a certificate verification error.
-# This breaks remote data sources (ARCO, WB2ERA5, CDS, ...).
-#
-# Details:
-# - Set it in Python's os.environ, not Julia's ENV. os.environ also calls
-#   putenv, so OpenSSL sees it, while Julia's own HTTPS clients are unaffected.
-# - Must run before importing earth2studio; some libraries in its data-source
-#   stack read SSL settings at import time and cache them.
-function _ensure_ssl_cert_file()
-    environ = pyimport("os").environ
-    pycontains(environ, "SSL_CERT_FILE") && return  # If user already set, ignore
-    cert = try
-        pyconvert(String, pyimport("certifi").where())  # Use certifi's SSL_CERT_FILE
-    catch
-        return
-    end
-    environ["SSL_CERT_FILE"] = cert
-    return
 end
 
 end # module

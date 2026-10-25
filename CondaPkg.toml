@@ -7,6 +7,8 @@ xarray = ""
 eccodes = ""
 pygrib = ""
 rasterio = ""
+truststore = ""
+python-dateutil = "<3"  # arraylake (earth2studio[data]) requires <3
 
 [pip.deps.earth2studio]
 version = ">=0.18"

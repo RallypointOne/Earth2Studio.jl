@@ -45,12 +45,13 @@ Example — fetch data from ARCO ERA5:
 ```julia
 using Earth2Studio
 using Dates
+using PythonCall: pylist
 
 ds = Earth2Studio.data.ARCO()
-da = ds(DateTime(2023, 6, 15), ["t2m", "u10m"])   # xarray.DataArray
+da = ds(DateTime(2023, 6, 15), pylist(["t2m", "u10m"]))   # xarray.DataArray
 ```
 
-`DateTime` and `String` convert to `datetime.datetime` and `str`. Julia vectors are passed as `juliacall.VectorValue` wrappers, which earth2studio accepts wherever it iterates over a list. For `Date`, convert with `DateTime(d)` first — earth2studio mixes `datetime.datetime` and `datetime.date` internally, which Python disallows.
+`DateTime` and `String` convert to `datetime.datetime` and `str`. Julia vectors are passed as `juliacall.VectorValue` wrappers that call back into Julia when iterated. The `run` workflows accept them, but data sources iterate on a background thread where that callback can deadlock, so pass lists to data sources with `pylist`. For `Date`, convert with `DateTime(d)` first — earth2studio mixes `datetime.datetime` and `datetime.date` internally, which Python disallows.
 
 Example — deterministic forecast:
 
