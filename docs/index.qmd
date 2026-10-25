@@ -17,18 +17,7 @@ extras = ["fcn", "pangu"]
 
 See [Basics](tutorials/basics.qmd) for the Julia-to-Python conversion rules, [Forecasting](tutorials/forecasting.qmd) for running a model, and [Julia packages](tutorials/julia-packages.qmd) for moving results into DimensionalData and Makie. The example below fetches a field from ARCO ERA5 and plots it with [CairoMakie](https://docs.makie.org):
 
-```{julia}
-#| echo: false
-#| output: false
-# On first zarr chunk decode, numcodecs creates a multiprocessing.Lock, which spawns a
-# resource_tracker subprocess. That child inherits the stdout/stderr pipe the notebook
-# runner uses to capture cell output and keeps it open, so the render hangs waiting for
-# EOF. Spawn the tracker here with stdio pointed at /dev/null so it never holds the pipe.
-using PythonCall: pyimport
-redirect_stdio(stdout=devnull, stderr=devnull) do
-    pyimport("multiprocessing.resource_tracker").ensure_running()
-end
-```
+{{< include _setup.qmd >}}
 
 ```{julia}
 using Earth2Studio

@@ -1,0 +1,12 @@
+```{julia}
+#| echo: false
+#| output: false
+# On first zarr chunk decode, numcodecs creates a multiprocessing.Lock, which spawns a
+# resource_tracker subprocess. That child inherits the stdout/stderr pipe the notebook
+# runner uses to capture cell output and keeps it open, so the render hangs waiting for
+# EOF. Spawn the tracker here with stdio pointed at /dev/null so it never holds the pipe.
+using PythonCall: pyimport
+redirect_stdio(stdout=devnull, stderr=devnull) do
+    pyimport("multiprocessing.resource_tracker").ensure_running()
+end
+```

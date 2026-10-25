@@ -6,16 +6,7 @@ A forecast in earth2studio has three parts: a data source that supplies the init
 
 The model used here is `models.px.Persistence`, which returns the initial condition at every lead time. It has no weights and needs no GPU, so the page executes during the docs build. Replacing it with a trained model changes one line; see [Trained models](#trained-models).
 
-```{julia}
-#| echo: false
-#| output: false
-# Spawn multiprocessing's resource_tracker with stdio detached so the docs build does not
-# hang on the first zarr chunk decode. See index.qmd for details.
-using PythonCall: pyimport
-redirect_stdio(stdout=devnull, stderr=devnull) do
-    pyimport("multiprocessing.resource_tracker").ensure_running()
-end
-```
+{{< include ../_setup.qmd >}}
 
 ```{julia}
 using Earth2Studio

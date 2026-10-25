@@ -30,26 +30,11 @@ end
 end
 
 #-------------------------------------------------------------------------------# Submodule wiring
-@testset "submodules resolve to expected dotted names" begin
-    @test pyconvert(String, Earth2Studio.earth2studio.__name__) == "earth2studio"
-    @test pyconvert(String, Earth2Studio.data.__name__)         == "earth2studio.data"
-    @test pyconvert(String, Earth2Studio.models.__name__)       == "earth2studio.models"
-    @test pyconvert(String, Earth2Studio.perturbation.__name__) == "earth2studio.perturbation"
-    @test pyconvert(String, Earth2Studio.io.__name__)           == "earth2studio.io"
-    @test pyconvert(String, Earth2Studio.run.__name__)          == "earth2studio.run"
-    @test pyconvert(String, Earth2Studio.statistics.__name__)   == "earth2studio.statistics"
-    @test pyconvert(String, Earth2Studio.utils.__name__)        == "earth2studio.utils"
-end
-
 @testset "references are the same Py objects as direct pyimport" begin
-    @test pyis(Earth2Studio.earth2studio, pyimport("earth2studio"))
-    @test pyis(Earth2Studio.data,         pyimport("earth2studio.data"))
-    @test pyis(Earth2Studio.models,       pyimport("earth2studio.models"))
-    @test pyis(Earth2Studio.perturbation, pyimport("earth2studio.perturbation"))
-    @test pyis(Earth2Studio.io,           pyimport("earth2studio.io"))
-    @test pyis(Earth2Studio.run,          pyimport("earth2studio.run"))
-    @test pyis(Earth2Studio.statistics,   pyimport("earth2studio.statistics"))
-    @test pyis(Earth2Studio.utils,        pyimport("earth2studio.utils"))
+    for name in NAMES
+        pyname = name == :earth2studio ? "earth2studio" : "earth2studio.$name"
+        @test pyis(getfield(Earth2Studio, name), pyimport(pyname))
+    end
 end
 
 #-------------------------------------------------------------------------------# TLS certificates

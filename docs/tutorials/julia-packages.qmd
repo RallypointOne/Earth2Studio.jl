@@ -4,16 +4,7 @@ title: "Julia packages"
 
 earth2studio returns `xarray` objects from data sources and IO backends. [DimensionalData.jl](https://rafaqz.github.io/DimensionalData.jl/) converts `xarray.DataArray` and `xarray.Dataset` to `DimArray` and `DimStack` without copying the data, and its Makie extension plots the result with labelled axes. The PythonCall integration activates automatically when both packages are loaded.
 
-```{julia}
-#| echo: false
-#| output: false
-# Spawn multiprocessing's resource_tracker with stdio detached so the docs build does not
-# hang on the first zarr chunk decode. See index.qmd for details.
-using PythonCall: pyimport
-redirect_stdio(stdout=devnull, stderr=devnull) do
-    pyimport("multiprocessing.resource_tracker").ensure_running()
-end
-```
+{{< include ../_setup.qmd >}}
 
 ```{julia}
 using Earth2Studio
