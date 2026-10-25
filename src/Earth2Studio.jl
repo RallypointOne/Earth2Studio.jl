@@ -26,17 +26,8 @@ for (name, desc) in SUBMODULES
 end
 
 function __init__()
-    # Make HTTPS work for Python. Inside Julia, Python's `ssl` module binds to the OpenSSL that
-    # Julia already loaded, whose default CA bundle path is a build-machine path that does not
-    # exist, so remote data sources (ARCO, WB2ERA5, CDS, ...) fail certificate verification.
-    # truststore makes Python verify against the OS trust store instead. Unlike setting
-    # SSL_CERT_FILE, it changes nothing outside Python, so Julia's own HTTPS clients are unaffected.
-    # It must run before importing earth2studio: aiohttp creates its SSL context at import time.
-    pyimport("truststore").inject_into_ssl()
-    # Make the eccodes bindings load the conda libeccodes that pygrib links. By default findlibs
-    # prefers the eccodeslib wheel (required by earth2studio[data]), and two different libeccodes
-    # versions in one process crash on import.
-    pyimport("os").environ.setdefault("FINDLIBS_DISABLE_PACKAGE", "yes")
+    pyimport("truststore").inject_into_ssl()  # Julia's OpenSSL has no CA bundle; use the OS trust store
+    pyimport("os").environ.setdefault("FINDLIBS_DISABLE_PACKAGE", "yes")  # use conda's libeccodes, not eccodeslib's
     pycopy!(earth2studio, pyimport("earth2studio"))
     for (name, _) in SUBMODULES
         pycopy!(getfield(@__MODULE__, name), pyimport("earth2studio.$name"))
