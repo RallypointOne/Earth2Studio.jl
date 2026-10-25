@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-10-25 18:24:16</td>
+            <td class="headerValue">2026-10-25 18:32:13</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">-</td>
@@ -88,25 +88,16 @@
 <span id="L26"><span class="lineNum">      26</span>              : end</span>
 <span id="L27"><span class="lineNum">      27</span>              : </span>
 <span id="L28"><span class="lineNum">      28</span> <span class="tlaGNC tlaBgGNC">           1 : function __init__()</span></span>
-<span id="L29"><span class="lineNum">      29</span>              :     # Make HTTPS work for Python. Inside Julia, Python's `ssl` module binds to the OpenSSL that</span>
-<span id="L30"><span class="lineNum">      30</span>              :     # Julia already loaded, whose default CA bundle path is a build-machine path that does not</span>
-<span id="L31"><span class="lineNum">      31</span>              :     # exist, so remote data sources (ARCO, WB2ERA5, CDS, ...) fail certificate verification.</span>
-<span id="L32"><span class="lineNum">      32</span>              :     # truststore makes Python verify against the OS trust store instead. Unlike setting</span>
-<span id="L33"><span class="lineNum">      33</span>              :     # SSL_CERT_FILE, it changes nothing outside Python, so Julia's own HTTPS clients are unaffected.</span>
-<span id="L34"><span class="lineNum">      34</span>              :     # It must run before importing earth2studio: aiohttp creates its SSL context at import time.</span>
-<span id="L35"><span class="lineNum">      35</span> <span class="tlaGNC">           1 :     pyimport(&quot;truststore&quot;).inject_into_ssl()</span></span>
-<span id="L36"><span class="lineNum">      36</span>              :     # Make the eccodes bindings load the conda libeccodes that pygrib links. By default findlibs</span>
-<span id="L37"><span class="lineNum">      37</span>              :     # prefers the eccodeslib wheel (required by earth2studio[data]), and two different libeccodes</span>
-<span id="L38"><span class="lineNum">      38</span>              :     # versions in one process crash on import.</span>
-<span id="L39"><span class="lineNum">      39</span> <span class="tlaGNC">           1 :     pyimport(&quot;os&quot;).environ.setdefault(&quot;FINDLIBS_DISABLE_PACKAGE&quot;, &quot;yes&quot;)</span></span>
-<span id="L40"><span class="lineNum">      40</span> <span class="tlaGNC">           1 :     pycopy!(earth2studio, pyimport(&quot;earth2studio&quot;))</span></span>
-<span id="L41"><span class="lineNum">      41</span> <span class="tlaGNC">           1 :     for (name, _) in SUBMODULES</span></span>
-<span id="L42"><span class="lineNum">      42</span> <span class="tlaGNC">           7 :         pycopy!(getfield(@__MODULE__, name), pyimport(&quot;earth2studio.$name&quot;))</span></span>
-<span id="L43"><span class="lineNum">      43</span> <span class="tlaGNC">           8 :     end</span></span>
-<span id="L44"><span class="lineNum">      44</span> <span class="tlaGNC">           1 :     return nothing</span></span>
-<span id="L45"><span class="lineNum">      45</span>              : end</span>
-<span id="L46"><span class="lineNum">      46</span>              : </span>
-<span id="L47"><span class="lineNum">      47</span>              : end # module</span>
+<span id="L29"><span class="lineNum">      29</span> <span class="tlaGNC">           1 :     pyimport(&quot;truststore&quot;).inject_into_ssl()  # Julia's OpenSSL has no CA bundle; use the OS trust store</span></span>
+<span id="L30"><span class="lineNum">      30</span> <span class="tlaGNC">           1 :     pyimport(&quot;os&quot;).environ.setdefault(&quot;FINDLIBS_DISABLE_PACKAGE&quot;, &quot;yes&quot;)  # use conda's libeccodes, not eccodeslib's</span></span>
+<span id="L31"><span class="lineNum">      31</span> <span class="tlaGNC">           1 :     pycopy!(earth2studio, pyimport(&quot;earth2studio&quot;))</span></span>
+<span id="L32"><span class="lineNum">      32</span> <span class="tlaGNC">           1 :     for (name, _) in SUBMODULES</span></span>
+<span id="L33"><span class="lineNum">      33</span> <span class="tlaGNC">           7 :         pycopy!(getfield(@__MODULE__, name), pyimport(&quot;earth2studio.$name&quot;))</span></span>
+<span id="L34"><span class="lineNum">      34</span> <span class="tlaGNC">           8 :     end</span></span>
+<span id="L35"><span class="lineNum">      35</span> <span class="tlaGNC">           1 :     return nothing</span></span>
+<span id="L36"><span class="lineNum">      36</span>              : end</span>
+<span id="L37"><span class="lineNum">      37</span>              : </span>
+<span id="L38"><span class="lineNum">      38</span>              : end # module</span>
         </pre>
               </td>
             </tr>
